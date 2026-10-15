@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mezun Köşesi — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-sayfa="kose">
+<section class="sayfa-bas"><div class="kap">
+  <h1>Mezun Köşesi</h1>
+  <p>Mezunlarımızın yazıları, başarı hikâyeleri, etkinlikleri ve iş ilanları.</p>
+</div></section>
+
+<main><div class="kap">
+  <div class="kart" style="margin-bottom:18px">
+    <div class="arac-satiri" style="margin-bottom:12px">
+      <div class="sekmeler" id="turler">
+        <button data-d="" class="aktif">Tümü</button><button data-d="Yazi">Yazı</button><button data-d="BasariHikayesi">Başarı Hikâyesi</button>
+        <button data-d="Etkinlik">Etkinlik</button><button data-d="IsIlani">İş İlanı</button>
+      </div>
+      <a class="btn btn-ana" href="panel.html#kose">+ İçerik gönder</a>
+    </div>
+    <div class="izgara i3" style="align-items:end">
+      <div><label for="bolum">Bölüm</label><select id="bolum"><option value="">Tüm bölümler</option></select></div>
+      <div><label for="yil">Mezuniyet yılı</label><select id="yil"><option value="">Tüm yıllar</option></select></div>
+      <div><button class="btn btn-cizgi" id="temizle" type="button">Filtreleri temizle</button></div>
+    </div>
+  </div>
+
+  <div class="bolum-bas"><h2 id="baslik">Tüm İçerikler</h2><span class="soluk" id="adet"></span></div>
+  <div class="izgara i3" id="liste"></div>
+</div></main>
+
+<script src="assets/veri.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  const V = MEZUN;
+  let tur = F.param("tur") || "";
+  const selB = document.getElementById("bolum"), selY = document.getElementById("yil");
+  [...new Set(V.kose.map(x=>x.program).filter(p=>p&&p!=="—"))].sort((a,b)=>a.localeCompare(b,"tr")).forEach(p=>selB.add(new Option(p,p)));
+  [...new Set(V.kose.map(x=>x.yil).filter(Boolean))].sort((a,b)=>b-a).forEach(y=>selY.add(new Option(y,y)));
+
+  function ciz(){
+    const l = V.kose.filter(x => (!tur||x.tur===tur) && (!selB.value||x.program===selB.value) && (!selY.value||String(x.yil)===selY.value));
+    document.getElementById("baslik").textContent = tur ? F.turAd(tur) : "Tüm İçerikler";
+    document.getElementById("adet").textContent = l.length + " içerik";
+    document.getElementById("liste").innerHTML = l.length ? l.map(x=>KART.icerik(x)).join("")
+      : '<div class="kart soluk" style="grid-column:1/-1">Bu filtrelere uyan içerik bulunamadı.</div>';
+  }
+  const tg = document.getElementById("turler");
+  tg.querySelectorAll("button").forEach(b=>b.classList.toggle("aktif", b.dataset.d===tur));
+  sekmeBagla(tg, d=>{ tur=d; ciz(); });
+  selB.onchange = selY.onchange = ciz;
+  document.getElementById("temizle").onclick = ()=>{ selB.value=""; selY.value=""; ciz(); };
+  ciz();
+</script>
+</body>
+</html>

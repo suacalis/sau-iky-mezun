@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yönetici Girişi — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-sayfa="yonetici">
+<main><div class="kap" style="max-width:520px">
+  <div class="kart">
+    <span class="rozet">Personel</span>
+    <h2 style="margin-top:10px">Yönetici Girişi</h2>
+    <p class="soluk">Mezun Bilgi Sistemi yöneticileri ve birim sorumluları için. Kurumsal hesabınızla (SABİS / LDAP) giriş yapılır.</p>
+    <div class="uyari" style="margin-bottom:14px">Prototip: bu ekranın kimlik doğrulaması yoktur ve hiçbir yere veri göndermez. Gerçek kurulumda SABİS tek oturum açma (SSO) ile bağlanmalıdır.</div>
+    <form id="f" novalidate>
+      <div class="alan"><label for="k">Kurumsal e-posta / kullanıcı adı</label><input id="k" autocomplete="username" placeholder="ad.soyad@sakarya.edu.tr"></div>
+      <div class="alan"><label for="s">Şifre</label><input id="s" type="password" autocomplete="current-password"></div>
+      <div id="m"></div>
+      <button class="btn btn-ana" type="submit" style="width:100%;justify-content:center">Giriş Yap</button>
+    </form>
+    <p class="soluk" style="margin-top:16px;font-size:14px"><a href="giris.html">Mezun Girişi</a> · <a href="index.html">Ana Sayfa</a></p>
+  </div>
+
+  <div class="kart" style="margin-top:16px">
+    <h3>Yönetici panelinde neler olur?</h3>
+    <ul class="soluk" style="margin:0;padding-left:18px">
+      <li>Mezun Köşesi gönderilerini onaylama / reddetme, vitrine alma</li>
+      <li>Duyuru yayımlama ve düzenleme</li>
+      <li>Mezun anketlerini oluşturma ve sonuçları dışa aktarma</li>
+      <li>Birim bazlı mezun listeleri ve istatistik raporları</li>
+    </ul>
+  </div>
+</div></main>
+<script src="assets/veri.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+document.getElementById("f").onsubmit = e => {
+  e.preventDefault();
+  document.getElementById("s").value = "";
+  document.getElementById("m").innerHTML = '<div class="uyari" style="margin-bottom:12px">Bu prototipte yönetici paneli yer almıyor; giriş SABİS SSO entegrasyonuyla etkinleştirilecek.</div>';
+};
+</script>
+</body>
+</html>

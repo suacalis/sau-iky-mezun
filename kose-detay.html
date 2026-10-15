@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mezun Köşesi — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-sayfa="kose">
+<section class="sayfa-bas"><div class="kap makale">
+  <a class="geri" href="kose.html">← Mezun Köşesi</a>
+  <div id="tur"></div>
+  <h1 id="baslik" style="margin-top:10px">İçerik</h1>
+  <p id="ust-yazar"></p>
+</div></section>
+
+<main><div class="kap">
+  <article class="makale">
+    <div class="kart" style="padding:0;overflow:hidden">
+      <div id="gorsel" style="aspect-ratio:21/9;background:linear-gradient(135deg,#dbe7f8,#eef3fb);display:grid;place-items:center;color:var(--lacivert);font-weight:800;font-size:56px"></div>
+      <div class="govde" id="govde" style="padding:24px 28px"></div>
+      <div style="border-top:1px solid var(--cizgi);padding:16px 28px" class="yazar-kart">
+        <span class="avatar" id="avatar"></span>
+        <div><b id="yazar"></b><div class="soluk" style="font-size:13.5px" id="meta"></div></div>
+      </div>
+    </div>
+    <section class="bolum">
+      <div class="bolum-bas"><h2>Diğer içerikler</h2><a href="kose.html">Tümü →</a></div>
+      <div class="izgara i2" id="diger"></div>
+    </section>
+  </article>
+</div></main>
+
+<script src="assets/veri.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  const V = MEZUN, id = +F.param("id") || V.kose[0].id;
+  const x = V.kose.find(k=>k.id===id);
+  if(!x){
+    document.getElementById("baslik").textContent = "İçerik bulunamadı";
+    document.getElementById("govde").innerHTML = '<p>Aradığınız içerik yayından kaldırılmış olabilir. <a href="kose.html">Mezun Köşesi\'ne dönün</a>.</p>';
+  } else {
+    document.title = x.baslik + " — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi";
+    const yz = [x.yazar, x.program!=="—"?x.program:null, x.yil].filter(Boolean).join(" · ");
+    document.getElementById("tur").innerHTML = `<span class="rozet ${F.turRenk(x.tur)}">${F.turAd(x.tur)}</span>`;
+    document.getElementById("baslik").textContent = x.baslik;
+    document.getElementById("ust-yazar").textContent = yz;
+    document.getElementById("gorsel").textContent = F.bas(x.baslik);
+    document.getElementById("govde").innerHTML = x.govde.map(p=>`<p>${F.esc(p)}</p>`).join("");
+    document.getElementById("avatar").textContent = F.bas(x.yazar);
+    document.getElementById("yazar").textContent = yz;
+    document.getElementById("meta").textContent = `${F.tarih(x.tarih)} tarihinde yayımlandı · ${F.n(x.goruntulenme)} görüntülenme`;
+    document.getElementById("diger").innerHTML = V.kose.filter(k=>k.id!==id).slice(0,2).map(k=>KART.icerik(k,false)).join("");
+  }
+</script>
+</body>
+</html>

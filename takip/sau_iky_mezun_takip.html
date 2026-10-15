@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SAÜ İKY Mezun Takip Sistemi</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--navy:#0b2e59;--blue:#00a3e0;--ink:#1f2937;--mut:#6b7280;--line:#e5e7eb;--bg:#f4f6fa;--card:#fff;--red:#e4572e}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+header{background:linear-gradient(120deg,#0b2e59 0%,#123f78 60%,#0a6fa8 100%);color:#fff;padding:18px 24px 14px}
+header h1{margin:0;font-size:22px;font-weight:600}
+header .sub{opacity:.85;font-size:13px;margin-top:4px}
+.hrow{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:3px 10px;font-size:12px;margin-top:8px}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{border:1px solid #cbd5e1;background:#fff;color:var(--navy);border-radius:6px;padding:6px 11px;font-size:12.5px;cursor:pointer;font-weight:600}
+.btn:hover{background:#eef6fc;border-color:var(--blue)}
+header .btn{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.45)}
+header .btn:hover{background:rgba(255,255,255,.25)}
+.filters{display:flex;flex-wrap:wrap;gap:12px;padding:12px 24px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:1000}
+.filters label{display:flex;flex-direction:column;font-size:11px;color:var(--mut);font-weight:600;gap:3px}
+.filters select{padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;min-width:130px;background:#fff}
+.tabs{display:flex;gap:4px;padding:10px 24px 0;flex-wrap:wrap}
+.tab{border:none;background:transparent;padding:9px 14px;font-size:13.5px;cursor:pointer;color:var(--mut);border-bottom:3px solid transparent;font-weight:600}
+.tab.on{color:var(--navy);border-color:var(--blue)}
+main{padding:14px 24px 40px}
+.pane{display:none}.pane.on{display:block}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;border-top:3px solid var(--blue)}
+.kpi .v{font-size:22px;font-weight:700;color:var(--navy)}
+.kpi .l{font-size:11.5px;color:var(--mut);margin-top:2px}
+.kpi .s{font-size:11px;color:#9ca3af;margin-top:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.card.wide{grid-column:1/-1}
+.card-h{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.card-h h3{margin:0;font-size:14.5px;color:var(--navy)}
+.dl{display:flex;gap:5px}
+.dl button{font-size:11px;padding:3px 8px;border-radius:5px;border:1px solid #cbd5e1;background:#f8fafc;cursor:pointer;color:#334155;font-weight:600}
+.dl button:hover{border-color:var(--blue);color:var(--navy)}
+.note{font-size:11.5px;color:var(--mut);margin:8px 0 0;line-height:1.45}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{background:#eef2f7;color:#334155;text-align:left;padding:7px 8px;font-weight:600;white-space:nowrap;border-bottom:1px solid #d6dde7}
+td{padding:6px 8px;border-bottom:1px solid #eef0f3;white-space:nowrap}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+tr:hover td{background:#f8fbff}
+#map{height:580px;border-radius:8px;border:1px solid var(--line)}
+.legend{background:#fff;padding:8px 10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,.25);font-size:11.5px;line-height:1.6;max-height:300px;overflow:auto}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.toolbar input,.toolbar select{padding:6px 9px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px}
+.pager{display:flex;gap:6px;align-items:center;justify-content:flex-end;margin-top:8px;font-size:12px;color:var(--mut)}
+.method h4{color:var(--navy);margin:18px 0 6px}
+.method p,.method li{line-height:1.6;max-width:960px}
+.warn{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:8px;padding:8px 12px;font-size:12.5px;margin-bottom:12px}
+.empty{padding:30px;text-align:center;color:var(--mut)}
+@media(max-width:600px){header,main,.filters,.tabs{padding-left:12px;padding-right:12px}#map{height:440px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <div>
+      <h1>SAÜ İKY Mezun Takip Sistemi</h1>
+      <div class="sub">Sakarya Üniversitesi İşletme Fakültesi · İnsan Kaynakları Yönetimi Bölümü · Lisans mezunları · ELA (Polonya) modeline uyarlanmış izleme paneli</div>
+      <span class="badge" id="srcBadge">Veri: demo (sentetik)</span>
+      <span class="badge" id="snapBadge">İzleme sonu: 31.12.2025 · azami 60 ay</span>
+    </div>
+    <div class="actions">
+      <button class="btn" id="btnUpload">Veri yükle (CSV/XLSX)</button>
+      <input type="file" id="fileIn" accept=".csv,.xlsx,.xls" hidden>
+      <button class="btn" id="btnTemplate">Şablon CSV</button>
+      <button class="btn" id="btnDemo">Demo veriye dön</button>
+      <button class="btn" id="btnAllXlsx">Tüm rapor (Excel)</button>
+      <button class="btn" id="btnAllCsv">Mezun verisi (CSV)</button>
+    </div>
+  </div>
+</header>
+
+<div class="filters">
+  <label>Mezuniyet yılı (kohort)<select id="fYil"></select></label>
+  <label>Cinsiyet<select id="fCins"></select></label>
+  <label>Öğretim türü<select id="fOg"></select></label>
+  <label>Mezuniyet öncesi iş deneyimi<select id="fDen"><option value="all">Tümü</option><option value="1">Var</option><option value="0">Yok</option></select></label>
+  <label>İşyeri ili<select id="fIl"></select></label>
+  <label>&nbsp;<button class="btn" id="btnReset">Filtreleri sıfırla</button></label>
+</div>
+
+<nav class="tabs" id="tabs">
+  <button class="tab on" data-tab="genel">Genel Bakış</button>
+  <button class="tab" data-tab="kohort">Kohort Karşılaştırması</button>
+  <button class="tab" data-tab="ucret">Ücretler ve Bölgesel Göstergeler</button>
+  <button class="tab" data-tab="harita">İşyeri Haritası</button>
+  <button class="tab" data-tab="veri">Mezun Verisi</button>
+  <button class="tab" data-tab="yontem">Yöntem</button>
+</nav>
+
+<main>
+  <section class="pane on" id="p-genel">
+    <div class="kpis" id="kpis"></div>
+    <div class="grid" id="g-genel"></div>
+  </section>
+  <section class="pane" id="p-kohort"><div class="grid" id="g-kohort"></div></section>
+  <section class="pane" id="p-ucret"><div id="ucretWarn"></div><div class="grid" id="g-ucret"></div></section>
+  <section class="pane" id="p-harita">
+    <div class="grid">
+      <div class="card wide">
+        <div class="card-h"><h3>Mezunların çalıştığı işyerleri — Türkiye haritası</h3>
+          <div class="toolbar" style="margin:0">
+            <select id="mapMode"><option value="isyeri">İşyeri bazında</option><option value="il">İl bazında (toplu)</option></select>
+            <select id="mapColor"><option value="sektor">Renk: sektör</option><option value="alan">Renk: alanla uyum</option></select>
+          </div>
+        </div>
+        <div id="map"></div>
+        <p class="note">Altlıklar Esri ArcGIS döşemeleridir (sağ üstten Sokak / Uydu / Topoğrafik / Açık Gri seçilebilir). Yalnızca izleme sonunda çalışan mezunlar gösterilir; daire büyüklüğü mezun sayısıyla orantılıdır. Koordinat sütunu boş bırakılan kayıtlar il merkezinin çevresine yerleştirilir. ★ Esentepe Kampüsü.</p>
+      </div>
+    </div>
+    <div class="grid" id="g-harita" style="margin-top:16px"></div>
+  </section>
+  <section class="pane" id="p-veri">
+    <div class="card">
+      <div class="card-h"><h3>Mezun düzeyinde veri (takma adlandırılmış)</h3>
+        <div class="dl"><button data-exp="ham" data-kind="csv">CSV</button><button data-exp="ham" data-kind="xlsx">Excel</button></div></div>
+      <div class="toolbar"><input id="q" placeholder="Ara: işyeri, pozisyon, il, kimlik…" size="34"><span id="qInfo" class="note" style="margin:0"></span></div>
+      <div class="tw" id="hamTable"></div>
+      <div class="pager"><button class="btn" id="pPrev">‹ Önceki</button><span id="pInfo"></span><button class="btn" id="pNext">Sonraki ›</button></div>
+    </div>
+  </section>
+  <section class="pane method" id="p-yontem"></section>
+</main>
+
+<script>
+'use strict';
+/* ====================== Yardımcılar ====================== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const okN=x=>x!=null&&isFinite(x);
+const fmtN=(x,d=0)=>!okN(x)?'–':Number(x).toLocaleString('tr-TR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtP=(x,d=1)=>!okN(x)?'–':'%'+(x*100).toLocaleString('tr-TR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtTL=x=>!okN(x)?'–':fmtN(x)+' ₺';
+const fmtK=x=>!okN(x)?'–':(Math.abs(x)>=1000?fmtN(x/1000,0)+' bin':fmtN(x));
+const trunc=(s,n)=>{s=String(s);return s.length>n?s.slice(0,n-1)+'…':s};
+const mean=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+const median=a=>{if(!a.length)return null;const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hashStr(s){let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+const countBy=(arr,fn)=>{const m=new Map();for(const x of arr){const k=fn(x);m.set(k,(m.get(k)||0)+1)}return m};
+
+/* ====================== Referans veriler (TEMSİLİ) ====================== */
+// İl ortalama brüt aylık ücret (2025 düzeyi, ₺) ve işsizlik oranı (%) — ELA'daki GUS (powiat) verisinin karşılığı.
+// Gösterim amaçlı yaklaşık değerlerdir; gerçek kullanımda TÜİK il düzeyi istatistikleriyle değiştirilmelidir.
+const IL={
+ 'Sakarya':{lat:40.7569,lng:30.3781,ucret:40000,issizlik:6.5},'İstanbul':{lat:41.0082,lng:28.9784,ucret:52000,issizlik:8.6},
+ 'Kocaeli':{lat:40.7654,lng:29.9408,ucret:50000,issizlik:7.2},'Ankara':{lat:39.9334,lng:32.8597,ucret:48000,issizlik:8.0},
+ 'İzmir':{lat:38.4237,lng:27.1428,ucret:44000,issizlik:10.4},'Bursa':{lat:40.1885,lng:29.0610,ucret:43000,issizlik:7.4},
+ 'Düzce':{lat:40.8438,lng:31.1565,ucret:37000,issizlik:6.0},'Bolu':{lat:40.7395,lng:31.6116,ucret:37500,issizlik:5.6},
+ 'Bilecik':{lat:40.1426,lng:29.9793,ucret:38000,issizlik:6.1},'Yalova':{lat:40.6550,lng:29.2769,ucret:39000,issizlik:8.0},
+ 'Tekirdağ':{lat:40.9780,lng:27.5110,ucret:41000,issizlik:6.2},'Eskişehir':{lat:39.7767,lng:30.5206,ucret:39500,issizlik:7.6},
+ 'Antalya':{lat:36.8969,lng:30.7133,ucret:39000,issizlik:8.1},'Konya':{lat:37.8746,lng:32.4932,ucret:37000,issizlik:6.4},
+ 'Kayseri':{lat:38.7312,lng:35.4787,ucret:37000,issizlik:8.2},'Gaziantep':{lat:37.0662,lng:37.3833,ucret:36000,issizlik:8.6},
+ 'Samsun':{lat:41.2867,lng:36.3300,ucret:36500,issizlik:6.6},'Trabzon':{lat:41.0027,lng:39.7168,ucret:36500,issizlik:7.0},
+ 'Zonguldak':{lat:41.4564,lng:31.7987,ucret:39000,issizlik:5.1},'Adana':{lat:37.0000,lng:35.3213,ucret:37500,issizlik:12.1},
+ 'Mersin':{lat:36.8121,lng:34.6415,ucret:38000,issizlik:11.0},'Denizli':{lat:37.7765,lng:29.0864,ucret:38000,issizlik:6.4},
+ 'Manisa':{lat:38.6191,lng:27.4289,ucret:39500,issizlik:6.6}
+};
+// Yıllık nominal ücret düzeyi katsayısı (2025=1) — temsili; RIW bu katsayıyı etkisizleştirir.
+const YF={2017:.095,2018:.11,2019:.13,2020:.155,2021:.19,2022:.34,2023:.58,2024:.84,2025:1,2026:1.27};
+const SNAP=2025;
+function yf(y){if(YF[y])return YF[y];const ks=Object.keys(YF).map(Number),mn=Math.min(...ks),mx=Math.max(...ks);return y<mn?YF[mn]*Math.pow(.85,mn-y):YF[mx]*Math.pow(1.27,y-mx)}
+const obsMonths=y=>Math.max(0,Math.min(60,(SNAP-y)*12+6));     // Haziran mezuniyeti, 31.12.2025 kesim, ELA gibi en çok 5 yıl
+const calYear=(y,m)=>y+Math.floor((5+m)/12);
+const ilWage=il=>IL[il]?IL[il].ucret:40000;
+const ilRate=il=>IL[il]?IL[il].issizlik:8.5;
+const KAMPUS=[40.7420,30.3320];
+
+// Kurgusal (gerçek olmayan) işveren adları — yalnızca demo
+const ISVERENLER=[
+ ['Adapazarı Otomotiv Yan Sanayi A.Ş.','Sakarya','Otomotiv'],['Sapanca Raylı Sistemler A.Ş.','Sakarya','İmalat'],
+ ['Sakarya Kamu Kurumları (temsili)','Sakarya','Kamu'],['Erenler Lojistik Hizmetleri A.Ş.','Sakarya','Lojistik'],
+ ['Serdivan Perakende Mağazacılık A.Ş.','Sakarya','Perakende'],['Hendek OSB Plastik Ltd.','Sakarya','İmalat'],
+ ['Karasu Gıda Sanayi A.Ş.','Sakarya','Gıda'],['Akyazı Tekstil Konfeksiyon Ltd.','Sakarya','Tekstil'],['Sakarya Özel Sağlık Grubu','Sakarya','Sağlık'],
+ ['Boğaziçi İK Hizmetleri A.Ş.','İstanbul','Danışmanlık / İK Hizmetleri'],['Marmara Katılım Finans A.Ş.','İstanbul','Bankacılık / Finans'],
+ ['Anadolu Yazılım Teknolojileri A.Ş.','İstanbul','Bilişim'],['Kadıköy Zincir Mağazaları A.Ş.','İstanbul','Perakende'],
+ ['İstanbul Bordro Danışmanlık Ltd.','İstanbul','Danışmanlık / İK Hizmetleri'],['Haliç Lojistik ve Depolama A.Ş.','İstanbul','Lojistik'],
+ ['Levent Sigorta A.Ş.','İstanbul','Bankacılık / Finans'],['İzmit Otomotiv Fabrikaları A.Ş.','Kocaeli','Otomotiv'],
+ ['Gebze Kimya Sanayi A.Ş.','Kocaeli','İmalat'],['Körfez Enerji Üretim A.Ş.','Kocaeli','Enerji'],['Dilovası Lojistik Merkezi A.Ş.','Kocaeli','Lojistik'],
+ ['Başkent Kamu Kurumları (temsili)','Ankara','Kamu'],['Çankaya Savunma Teknolojileri A.Ş.','Ankara','İmalat'],
+ ['Uludağ Otomotiv Parçaları A.Ş.','Bursa','Otomotiv'],['Nilüfer Tekstil Sanayi A.Ş.','Bursa','Tekstil'],
+ ['Ege Bilişim Hizmetleri A.Ş.','İzmir','Bilişim'],['Kordon Gıda Pazarlama A.Ş.','İzmir','Gıda'],['Düzce Orman Ürünleri A.Ş.','Düzce','İmalat'],
+ ['Bolu Unlu Mamuller A.Ş.','Bolu','Gıda'],['Bilecik Seramik Sanayi A.Ş.','Bilecik','İmalat'],['Yalova Tersane Hizmetleri A.Ş.','Yalova','İmalat'],
+ ['Çorlu Tekstil Boya Sanayi A.Ş.','Tekirdağ','Tekstil'],['Eskişehir Havacılık Parça A.Ş.','Eskişehir','İmalat'],['Antalya Turizm Otelcilik A.Ş.','Antalya','Turizm'],
+ ['Konya Tarım Makineleri A.Ş.','Konya','İmalat'],['Kayseri Mobilya Sanayi A.Ş.','Kayseri','İmalat'],['Gaziantep Halı Tekstil A.Ş.','Gaziantep','Tekstil'],
+ ['Karadeniz Eğitim Kurumları (temsili)','Samsun','Eğitim'],['Trabzon Liman İşletmeleri A.Ş.','Trabzon','Lojistik'],['Zonguldak Enerji Hizmetleri A.Ş.','Zonguldak','Enerji'],
+ ['Çukurova Gıda Sanayi A.Ş.','Adana','Gıda'],['Mersin Liman Lojistik A.Ş.','Mersin','Lojistik'],['Denizli Tekstil İhracat A.Ş.','Denizli','Tekstil'],
+ ['Manisa Beyaz Eşya Sanayi A.Ş.','Manisa','İmalat']
+];
+const IK_POZ=['İK Uzmanı','İK Uzman Yardımcısı','İşe Alım Uzmanı','Bordro ve Özlük İşleri Uzmanı','Eğitim ve Gelişim Uzmanı','İK İş Ortağı (HRBP)','Ücret ve Yan Haklar Uzmanı','Çalışan Deneyimi Uzmanı','İK Analitiği Uzmanı','İdari İşler ve İK Sorumlusu'];
+const DIGER_POZ=['Satış Temsilcisi','Müşteri Temsilcisi','Muhasebe Uzman Yardımcısı','Lojistik Planlama Uzmanı','Satın Alma Uzmanı','Mağaza Yöneticisi','Kalite Uzmanı','Proje Asistanı','Banka Operasyon Yetkilisi'];
+
+const PAL=['#0b2e59','#00a3e0','#e4572e','#f2a541','#2a9d8f','#8e6bbf','#c44569','#6c757d','#3d5a80','#98c1d9','#ee6c4d','#5f0f40','#7cb518','#293241'];
+const COH_PAL=['#9bd7f0','#5cc0e8','#1fa3d9','#1680c4','#1d5fae','#173f8a','#0b1f4d','#000000','#7a5195','#ef5675'];
+
+function firmCoord(name,il){const b=IL[il]||{lat:39.0,lng:35.0};const h=hashStr(name+'|'+il);
+ const dx=((h&0xffff)/0xffff-.5)*.16, dy=(((h>>>16)&0xffff)/0xffff-.5)*.11;return[+(b.lat+dy).toFixed(4),+(b.lng+dx).toFixed(4)]}
+
+/* ====================== Demo veri üretimi ====================== */
+function genDemo(){
+ const r=mulberry32(20261014);
+ const norm=()=>{let u=0;while(!u)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r())};
+ const wpick=o=>{const ks=Object.keys(o);let t=r()*ks.reduce((a,k)=>a+o[k],0);for(const k of ks){t-=o[k];if(t<=0)return k}return ks[0]};
+ const pick=a=>a[Math.floor(r()*a.length)];
+ const SIZES={2018:138,2019:146,2020:152,2021:160,2022:171,2023:165,2024:174};
+ const IL_W={'Sakarya':30,'İstanbul':24,'Kocaeli':14,'Ankara':5,'Bursa':5,'İzmir':3,'Düzce':3,'Bolu':2,'Bilecik':1.5,'Yalova':1.5,'Tekirdağ':1.5,'Eskişehir':1.5,'Antalya':1.2,'Konya':1,'Kayseri':.8,'Gaziantep':.6,'Samsun':.8,'Trabzon':.6,'Zonguldak':.8,'Adana':.6,'Mersin':.6,'Denizli':.6,'Manisa':.8};
+ const IKAMET_W={...IL_W,'Sakarya':45};
+ const SEC={'Bankacılık / Finans':.10,'Bilişim':.12,'Kamu':.04,'Perakende':-.08,'Otomotiv':.07,'İmalat':.03,'Enerji':.10,'Lojistik':0,'Tekstil':-.05,'Gıda':-.03,'Turizm':-.06,'Sağlık':0,'Eğitim':-.04,'Danışmanlık / İK Hizmetleri':.02};
+ const rows=[];let seq=0;
+ for(const ys of Object.keys(SIZES)){const y=+ys,N=obsMonths(y);
+  for(let i=0;i<SIZES[ys];i++){seq++;
+   const cins=r()<.62?'Kadın':'Erkek', og=r()<.55?'I. Öğretim':'II. Öğretim';
+   const gano=Math.round(clamp(2.9+.35*norm(),2,3.95)*100)/100;
+   const den=r()<(og==='II. Öğretim'?.45:.22), lu=r()<.11;
+   const pEmp=.72+(den?.08:0)+.07*(gano-2.9)+Math.min(5,SNAP-y)*.02-(y===2020?.05:0)-(lu?.15:0);
+   let durum; if(r()<pEmp)durum=r()<.05?'Kendi hesabına':'Ücretli çalışan';
+   else durum=(lu&&r()<.7)?'Lisansüstü öğrenci':(r()<.58?'Kayıtlı işsiz':'İşgücü dışı');
+   const cal=durum==='Ücretli çalışan'||durum==='Kendi hesabına';
+   let ilk=null,son=null;const had=cal||r()<(durum==='Kayıtlı işsiz'?.4:.25);
+   if(had){ilk=(den&&r()<.4)?0:Math.round(-Math.log(1-r())*(den?4:7))+(y===2020?3:0);
+    if(cal){if(ilk>N-1)ilk=Math.max(0,N-1-Math.floor(r()*4))}
+    else{if(ilk>N-4)ilk=null;else{son=ilk+3+Math.floor(r()*Math.max(1,N-ilk-4));if(son>=N)son=N-1}}}
+   const worked=ilk==null?0:(cal?N-Math.max(1,ilk)+1:son-Math.max(1,ilk)+1), nonEmp=Math.max(0,N-worked);
+   let issiz=durum==='Kayıtlı işsiz'?Math.max(1,Math.round(nonEmp*(.25+.35*r()))):durum==='İşgücü dışı'?(r()<.3?Math.round(r()*3):0):durum==='Lisansüstü öğrenci'?0:Math.round((ilk||0)*.45*(.5+r()));
+   issiz=Math.min(issiz,nonEmp);
+   let isyeri='',sektor='',poz='',il='',lat='',lng='',alan=false,soz='',ucret='',isv=0;
+   if(had){il=wpick(IL_W);
+    if(durum==='Kendi hesabına'){isyeri=`Serbest İK danışmanlığı (${il})`;sektor='Danışmanlık / İK Hizmetleri';poz='Serbest İK Danışmanı';alan=true;soz='Bağ-Kur (4/b)'}
+    else{const c=ISVERENLER.filter(e=>e[1]===il);const e=c[Math.min(c.length-1,Math.floor(Math.pow(r(),1.6)*c.length))];
+     isyeri=e[0];sektor=e[2];alan=r()<(sektor==='Danışmanlık / İK Hizmetleri'?.9:.58);
+     poz=alan?pick(IK_POZ):(sektor==='Kamu'?pick(['Memur','Uzman Yardımcısı','Şef']):pick(DIGER_POZ));
+     const q=r();soz=sektor==='Kamu'?'Kamu kadrosu':(q<.78?'Belirsiz süreli':q<.93?'Belirli süreli':'Kısmi süreli')}
+    [lat,lng]=firmCoord(isyeri,il);isv=1+Math.floor(r()*r()*Math.max(1,worked/14))}
+   const ikamet=cal?(r()<.92?il:wpick(IKAMET_W)):(had&&r()<.6?il:wpick(IKAMET_W));
+   if(had){const refM=cal?N:son;let ratio=.78+.065*refM/12+(den?.06:0)+.08*(gano-2.9)+(SEC[sektor]||0)+(alan?.03:0)+(soz==='Kısmi süreli'?-.3:0)+.11*norm();
+    ratio=clamp(ratio,.5,2.3);ucret=Math.round(ratio*ilWage(ikamet)*yf(calYear(y,refM))/50)*50}
+   rows.push({mezun_id:'P'+hashStr('sau-iky-'+seq).toString(16).toUpperCase().padStart(8,'0'),mezuniyet_yili:y,cinsiyet:cins,ogretim_turu:og,gano,
+    mezuniyet_oncesi_deneyim:den?'Evet':'Hayır',lisansustu:lu?'Evet':'Hayır',durum,ilk_is_suresi_ay:ilk??'',son_calisma_ay:son??'',issiz_kayit_ay:issiz,
+    isveren_sayisi:isv,isyeri,sektor,pozisyon:poz,alanla_ilgili:had?(alan?'Evet':'Hayır'):'',sozlesme_turu:soz,isyeri_il:il,enlem:lat,boylam:lng,ikamet_il:ikamet,son_ay_brut_ucret:ucret});
+ }}
+ return rows;
+}
+
+/* ====================== Veri modeli ====================== */
+const COLS=[['mezun_id','Takma ad kimliği (KVKK: TC kimlik no değil)'],['mezuniyet_yili','Mezuniyet yılı (kohort)'],['cinsiyet','Kadın / Erkek'],['ogretim_turu','I. Öğretim / II. Öğretim'],
+ ['gano','Genel not ortalaması (4\'lük)'],['mezuniyet_oncesi_deneyim','Mezuniyet öncesi sigortalı çalışma: Evet/Hayır'],['lisansustu','Lisansüstü programa kayıt: Evet/Hayır'],
+ ['durum','İzleme sonu durumu: Ücretli çalışan / Kendi hesabına / Kayıtlı işsiz / İşgücü dışı / Lisansüstü öğrenci'],['ilk_is_suresi_ay','Mezuniyetten ilk sigortalı işe kadar geçen ay (0 = öncesinde/aynı ay; boş = iş bulamadı)'],
+ ['son_calisma_ay','Şu an çalışmayanlarda son çalışılan ay (mezuniyetten itibaren); çalışanlarda boş'],['issiz_kayit_ay','İŞKUR\'da kayıtlı işsiz geçirilen ay sayısı'],
+ ['isveren_sayisi','İzleme döneminde çalışılan işveren sayısı'],['isyeri','Son/şu anki işyeri'],['sektor','Sektör'],['pozisyon','Pozisyon'],['alanla_ilgili','İK alanıyla ilgili pozisyon: Evet/Hayır'],
+ ['sozlesme_turu','Sözleşme / sigorta türü'],['isyeri_il','İşyeri ili'],['enlem','İşyeri enlemi (boşsa il merkezi)'],['boylam','İşyeri boylamı'],['ikamet_il','İkamet ili (yerel ücret/işsizlik karşılaştırması için)'],
+ ['son_ay_brut_ucret','İzlemenin son çalışılan ayındaki aylık brüt ücret (₺)']];
+const TRM={'ı':'i','İ':'i','ş':'s','Ş':'s','ğ':'g','Ğ':'g','ü':'u','Ü':'u','ö':'o','Ö':'o','ç':'c','Ç':'c'};
+const nk=k=>String(k).trim().replace(/[ıİşŞğĞüÜöÖçÇ]/g,c=>TRM[c]).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+const num=v=>{if(v===''||v==null)return null;if(typeof v==='number')return isFinite(v)?v:null;let s=String(v).trim().replace(/\s|₺/g,'');if(!s)return null;
+ s=(s.includes(',')&&s.includes('.'))?s.replace(/\./g,'').replace(',','.'):s.replace(',','.');const x=parseFloat(s);return isFinite(x)?x:null};
+const yes=v=>/^(evet|e|1|true|var|yes|x)$/i.test(String(v??'').trim());
+
+function fromRaw(raw,idx){const o={};for(const k in raw)o[nk(k)]=raw[k];
+ const y=num(o.mezuniyet_yili);if(!y)return null;
+ const durum=String(o.durum||'').trim()||'Bilinmiyor',dn=nk(durum);
+ const il=String(o.isyeri_il||'').trim();let lat=num(o.enlem),lng=num(o.boylam);const isyeri=String(o.isyeri||'').trim();
+ if((lat==null||lng==null)&&isyeri&&IL[il])[lat,lng]=firmCoord(isyeri,il);
+ const g={id:String(o.mezun_id||('R'+String(idx).padStart(5,'0'))),y:Math.round(y),cins:String(o.cinsiyet||'Belirtilmemiş').trim(),og:String(o.ogretim_turu||'Belirtilmemiş').trim(),
+  gano:num(o.gano),den:yes(o.mezuniyet_oncesi_deneyim),lisansustu:yes(o.lisansustu),durum,calisiyor:dn.includes('calisan')||dn.includes('kendi_hesab'),
+  ilk:num(o.ilk_is_suresi_ay),son:num(o.son_calisma_ay),issiz:num(o.issiz_kayit_ay)||0,isveren:num(o.isveren_sayisi)||0,isyeri,
+  sektor:String(o.sektor||'').trim()||'Belirtilmemiş',poz:String(o.pozisyon||'').trim(),alan:yes(o.alanla_ilgili),soz:String(o.sozlesme_turu||'').trim(),
+  il,lat,lng,ikamet:String(o.ikamet_il||il||'Sakarya').trim(),ucret:num(o.son_ay_brut_ucret)};
+ if(g.ilk!=null)g.ilk=Math.max(0,Math.round(g.ilk));if(g.son!=null)g.son=Math.round(g.son);
+ buildMonthly(g);return g}
+
+function toRaw(g){return{mezun_id:g.id,mezuniyet_yili:g.y,cinsiyet:g.cins,ogretim_turu:g.og,gano:g.gano??'',mezuniyet_oncesi_deneyim:g.den?'Evet':'Hayır',lisansustu:g.lisansustu?'Evet':'Hayır',
+ durum:g.durum,ilk_is_suresi_ay:g.ilk??'',son_calisma_ay:g.son??'',issiz_kayit_ay:g.issiz,isveren_sayisi:g.isveren,isyeri:g.isyeri,sektor:g.isyeri?g.sektor:'',pozisyon:g.poz,
+ alanla_ilgili:g.isyeri?(g.alan?'Evet':'Hayır'):'',sozlesme_turu:g.soz,isyeri_il:g.il,enlem:g.lat??'',boylam:g.lng??'',ikamet_il:g.ikamet,son_ay_brut_ucret:g.ucret??''}}
+
+// Aylık seri: ELA'daki ZUS aylık katkı kayıtlarının karşılığı (SGK aylık prim hizmet günleri)
+function buildMonthly(g){
+ const N=obsMonths(g.y),rr=mulberry32(hashStr(g.id));
+ const emp=new Array(N+1).fill(0),une=new Array(N+1).fill(0),ratio=new Array(N+1).fill(null),wage=new Array(N+1).fill(null);
+ if(g.ilk!=null&&N>0){const st=Math.max(1,g.ilk),en=g.calisiyor?N:Math.min(N,g.son??N);
+  for(let m=st;m<=en;m++)emp[m]=1;
+  if(g.isveren>1&&en-st>14&&rr()<.5){const gs=st+6+Math.floor(rr()*(en-st-12)),gl=1+Math.floor(rr()*3);for(let m=gs;m<gs+gl&&m<en;m++)emp[m]=0}}
+ let left=Math.round(g.issiz||0);
+ if(/kayitli_issiz/.test(nk(g.durum))){for(let m=N;m>=1&&left>0;m--)if(!emp[m]){une[m]=1;left--}}
+ else{for(let m=1;m<=N&&left>0;m++)if(!emp[m]){une[m]=1;left--}}
+ let refM=0;for(let m=N;m>=1;m--)if(emp[m]){refM=m;break}
+ if(refM&&okN(g.ucret)&&g.ucret>0){const w0=ilWage(g.ikamet),rRef=g.ucret/(w0*yf(calYear(g.y,refM)));
+  for(let m=1;m<=N;m++)if(emp[m]){ratio[m]=Math.max(.35,rRef-.07*(refM-m)/12+(rr()-.5)*.03);wage[m]=ratio[m]*w0*yf(calYear(g.y,m))}}
+ g.N=N;g.emp=emp;g.une=une;g.ratio=ratio;g.wage=wage;
+ g.uneShare=N?une.reduce((a,b)=>a+b,0)/N:null;
+ const rs=ratio.filter(v=>v!=null);g.riw=rs.length?mean(rs):null;
+ g.emp12=N>=12?emp[12]:null}
+
+/* ====================== Durum ====================== */
+let DATA=[],SRC='demo (sentetik)',ALL_YEARS=[],SEC_COLORS={};
+const EXP={};
+const ST={yil:'all',cins:'all',og:'all',den:'all',il:'all'};
+let page=0;
+
+function loadRows(gs,src){DATA=gs;SRC=src;ALL_YEARS=[...new Set(DATA.map(g=>g.y))].sort((a,b)=>a-b);
+ const sc=[...countBy(DATA.filter(g=>g.isyeri),g=>g.sektor)].sort((a,b)=>b[1]-a[1]);SEC_COLORS={};sc.forEach(([k],i)=>SEC_COLORS[k]=PAL[i%PAL.length]);
+ $('#srcBadge').textContent='Veri: '+src+' · '+fmtN(DATA.length)+' mezun';
+ Object.assign(ST,{yil:'all',cins:'all',og:'all',den:'all',il:'all'});fillFilters();page=0;renderAll()}
+const cohColor=y=>COH_PAL[ALL_YEARS.indexOf(y)%COH_PAL.length];
+
+function fillFilters(){
+ const opt=(sel,vals,lab)=>{sel.innerHTML='<option value="all">Tümü</option>'+vals.map(v=>`<option value="${esc(v)}">${esc(lab?lab(v):v)}</option>`).join('')};
+ opt($('#fYil'),ALL_YEARS);opt($('#fCins'),[...new Set(DATA.map(g=>g.cins))].sort());opt($('#fOg'),[...new Set(DATA.map(g=>g.og))].sort());
+ opt($('#fIl'),[...countBy(DATA.filter(g=>g.il),g=>g.il)].sort((a,b)=>b[1]-a[1]).map(x=>x[0]));
+ $('#fDen').value='all'}
+function filtered(){return DATA.filter(g=>(ST.yil==='all'||g.y==ST.yil)&&(ST.cins==='all'||g.cins===ST.cins)&&(ST.og==='all'||g.og===ST.og)&&(ST.den==='all'||(+g.den)==ST.den)&&(ST.il==='all'||g.il===ST.il))}
+
+/* ====================== Göstergeler ====================== */
+function stats(F){const n=F.length,cal=F.filter(g=>g.calisiyor),ilks=F.filter(g=>g.ilk!=null).map(g=>g.ilk),obs=F.filter(g=>g.N>0);
+ const risk=mean(obs.map(g=>g.uneShare)),loc=mean(obs.map(g=>ilRate(g.ikamet)/100)),e12=F.filter(g=>g.emp12!=null);
+ return{n,empRate:n?cal.length/n:null,emp12:e12.length?mean(e12.map(g=>g.emp12)):null,ilkMean:mean(ilks),ilkMed:median(ilks),never:n?(n-ilks.length)/n:null,
+  risk,riu:okN(risk)&&loc?risk/loc:null,riw:median(F.map(g=>g.riw).filter(okN)),alan:cal.length?cal.filter(g=>g.alan).length/cal.length:null,
+  lu:n?F.filter(g=>g.lisansustu).length/n:null,medW:median(cal.map(g=>g.ucret).filter(v=>okN(v)&&v>0)),isv:mean(F.filter(g=>g.isveren>0).map(g=>g.isveren))}}
+
+function monthlyByCohort(F,metric){const x=[];for(let m=1;m<=60;m++)x.push(m);const series=[],rows=[];
+ const ys=[...new Set(F.map(g=>g.y))].sort((a,b)=>a-b);
+ for(const y of ys){const G=F.filter(g=>g.y===y),vals=[];
+  for(let m=1;m<=60;m++){const A=G.filter(g=>g.N>=m);let v=null;
+   if(A.length>=8){if(metric==='emp')v=mean(A.map(g=>g.emp[m]));
+    else if(metric==='riu'){const risk=mean(A.map(g=>g.une[m])),loc=mean(A.map(g=>ilRate(g.ikamet)/100));v=risk/loc}
+    else if(metric==='riw'){const rs=A.filter(g=>g.emp[m]&&g.ratio[m]!=null).map(g=>g.ratio[m]);v=rs.length>=5?median(rs):null}}
+   vals.push(v)}
+  series.push({name:String(y),values:vals,color:cohColor(y),width:y===ys[ys.length-1]?2.6:1.8})}
+ for(let i=0;i<60;i++)rows.push([i+1,...series.map(s=>s.values[i])]);
+ return{x,series,headers:['Mezuniyetten sonraki ay',...series.map(s=>s.name+' kohortu')],rows}}
+
+/* ====================== SVG grafikler ====================== */
+const FONT='Segoe UI, Arial, sans-serif';
+function svgWrap(W,H,inner,title){return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="100%" font-family="${FONT}" font-size="12"><title>${esc(title||'')}</title><rect width="${W}" height="${H}" fill="#ffffff"/>${inner}</svg>`}
+const emptySVG=(t)=>svgWrap(640,120,`<text x="320" y="64" text-anchor="middle" fill="#9ca3af" font-size="13">Seçili filtrede gösterilecek veri yok</text>`,t);
+function niceMax(v){if(!(v>0))return 1;const p=10**Math.floor(Math.log10(v)),n=v/p;return(n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p}
+function legendSVG(items,x,y,maxW){let cx=x,cy=y,s='';for(const it of items){const tw=String(it.name).length*6.4+26;if(cx+tw>x+maxW&&cx>x){cx=x;cy+=18}
+  s+=`<rect x="${cx}" y="${cy-9}" width="14" height="${it.line?3:10}" ${it.line?`transform="translate(0,4)"`:''} fill="${it.color}" rx="1.5"/><text x="${cx+19}" y="${cy}" fill="#374151" font-size="11">${esc(it.name)}</text>`;cx+=tw}
+ return{s,h:items.length?cy-y+16:0}}
+
+function barChart(o){const W=o.w||640,fmt=o.fmt||(v=>fmtN(v)),ax=o.axisFmt||fmt,ser=o.series,k=ser.length;
+ const vals=ser.flatMap(s=>s.values).filter(okN);if(!vals.length||!o.cats.length)return emptySVG(o.title);
+ const max=o.max!=null?o.max:niceMax(Math.max(...vals,0));let s='';
+ if(o.horizontal){const n=o.cats.length,lw=o.labelW||210,leg=k>1?legendSVG(ser,lw,16,W-lw-10):{s:'',h:0};
+  const T=8+leg.h,rowH=k>1?13*k+10:24,H=T+n*rowH+26,pw=W-lw-64;s+=leg.s;
+  for(let i=0;i<=4;i++){const v=max*i/4,x=lw+pw*i/4;s+=`<line x1="${x}" x2="${x}" y1="${T}" y2="${T+n*rowH}" stroke="#e6e9ef"/><text x="${x}" y="${T+n*rowH+16}" text-anchor="middle" fill="#6b7280" font-size="10">${ax(v)}</text>`}
+  o.cats.forEach((c,i)=>{const y0=T+i*rowH,bh=(rowH-8)/k;s+=`<text x="${lw-8}" y="${y0+rowH/2+4}" text-anchor="end" fill="#1f2937" font-size="11.5">${esc(trunc(c,34))}</text>`;
+   ser.forEach((se,j)=>{const v=se.values[i];if(!okN(v))return;const bw=pw*v/max,y=y0+4+j*bh,col=se.colors?se.colors[i]:se.color;
+    s+=`<rect x="${lw}" y="${y}" width="${Math.max(0,bw)}" height="${bh-1}" fill="${col}" rx="2"><title>${esc(c)} — ${esc(se.name)}: ${fmt(v)}</title></rect><text x="${lw+bw+4}" y="${y+bh/2+3.5}" font-size="10" fill="#374151">${fmt(v)}</text>`})});
+  return svgWrap(W,H,s,o.title)}
+ const H=o.h||300,leg=k>1?legendSVG(ser,56,16,W-66):{s:'',h:0},L=58,R=12,T=16+leg.h,B=o.rotate?80:38,pw=W-L-R,ph=H-T-B;s+=leg.s;
+ for(let i=0;i<=5;i++){const v=max*i/5,y=T+ph-ph*i/5;s+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="#e6e9ef"/><text x="${L-6}" y="${y+4}" text-anchor="end" fill="#6b7280" font-size="10">${ax(v)}</text>`}
+ const n=o.cats.length,band=pw/n,bw=Math.min(46,band*.8/k);
+ o.cats.forEach((c,i)=>{const x0=L+band*i+(band-bw*k)/2;
+  ser.forEach((se,j)=>{const v=se.values[i];if(!okN(v))return;const bh=ph*Math.max(0,v)/max,x=x0+j*bw,y=T+ph-bh,col=se.colors?se.colors[i]:se.color;
+   s+=`<rect x="${x}" y="${y}" width="${Math.max(1,bw-2)}" height="${bh}" fill="${col}" rx="2"><title>${esc(c)} — ${esc(se.name)}: ${fmt(v)}</title></rect>`;
+   if(k<=3&&bw>16)s+=`<text x="${x+(bw-2)/2}" y="${y-4}" text-anchor="middle" font-size="${k>1?9:10}" fill="#1f2937">${fmt(v)}</text>`});
+  const cx=L+band*i+band/2;
+  s+=o.rotate?`<text transform="translate(${cx},${T+ph+12}) rotate(-35)" text-anchor="end" fill="#1f2937" font-size="11">${esc(trunc(c,24))}</text>`:`<text x="${cx}" y="${T+ph+18}" text-anchor="middle" fill="#1f2937" font-size="11">${esc(trunc(c,20))}</text>`});
+ s+=`<line x1="${L}" x2="${W-R}" y1="${T+ph}" y2="${T+ph}" stroke="#9ca3af"/>`;
+ if(o.yLabel)s+=`<text transform="translate(13,${T+ph/2}) rotate(-90)" text-anchor="middle" fill="#6b7280" font-size="11">${esc(o.yLabel)}</text>`;
+ return svgWrap(W,H,s,o.title)}
+
+function lineChart(o){const W=o.w||680,ser=o.series.filter(s=>s.values.some(okN));if(!ser.length)return emptySVG(o.title);
+ const leg=legendSVG(ser.map(s=>({...s,line:true})),58,16,W-70),L=58,R=18,T=18+leg.h,B=42,H=(o.h||300)+leg.h,pw=W-L-R,ph=H-T-B;
+ const vals=ser.flatMap(s=>s.values).filter(okN);let lo=o.yMin!=null?o.yMin:Math.min(...vals),hi=o.yMax!=null?o.yMax:Math.max(...vals);
+ if(o.refY!=null){lo=Math.min(lo,o.refY);hi=Math.max(hi,o.refY)}const pad=(hi-lo)*.08||.1;if(o.yMin==null)lo=Math.max(o.floor??-Infinity,lo-pad);if(o.yMax==null)hi+=pad;
+ const n=o.x.length,X=i=>L+pw*(n===1?.5:i/(n-1)),Y=v=>T+ph-ph*(v-lo)/(hi-lo);let s=leg.s;
+ for(let i=0;i<=5;i++){const v=lo+(hi-lo)*i/5,y=Y(v);s+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="#e6e9ef"/><text x="${L-6}" y="${y+4}" text-anchor="end" fill="#6b7280" font-size="10">${(o.fmt||(v=>fmtN(v,2)))(v)}</text>`}
+ for(let i=0;i<n;i++){if(!(i===0||(o.x[i]%(o.xEvery||6))===0))continue;s+=`<line x1="${X(i)}" x2="${X(i)}" y1="${T}" y2="${T+ph}" stroke="#f1f3f6"/><text x="${X(i)}" y="${T+ph+16}" text-anchor="middle" fill="#6b7280" font-size="10">${o.x[i]}</text>`}
+ if(o.refY!=null&&o.refY>=lo&&o.refY<=hi)s+=`<line x1="${L}" x2="${W-R}" y1="${Y(o.refY)}" y2="${Y(o.refY)}" stroke="#e4572e" stroke-dasharray="5 4"/><text x="${W-R-4}" y="${Y(o.refY)-5}" text-anchor="end" fill="#e4572e" font-size="10">${esc(o.refLabel||'')}</text>`;
+ if(o.band)s+=`<rect x="${X(o.band[0]-1)}" y="${T}" width="${X(o.band[1]-1)-X(o.band[0]-1)}" height="${ph}" fill="#fde2e1" opacity=".35"/>`;
+ for(const se of ser){let d='',pen=false;se.values.forEach((v,i)=>{if(!okN(v)){pen=false;return}d+=(pen?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)+' ';pen=true});
+  s+=`<path d="${d}" fill="none" stroke="${se.color}" stroke-width="${se.width||2}" stroke-linejoin="round" stroke-linecap="round"><title>${esc(se.name)}</title></path>`}
+ s+=`<line x1="${L}" x2="${W-R}" y1="${T+ph}" y2="${T+ph}" stroke="#9ca3af"/><text x="${L+pw/2}" y="${H-6}" text-anchor="middle" fill="#6b7280" font-size="11">${esc(o.xLabel||'')}</text>`;
+ if(o.yLabel)s+=`<text transform="translate(13,${T+ph/2}) rotate(-90)" text-anchor="middle" fill="#6b7280" font-size="11">${esc(o.yLabel)}</text>`;
+ return svgWrap(W,H,s,o.title)}
+
+function donutChart(o){const items=o.items.filter(i=>i.value>0);if(!items.length)return emptySVG(o.title);
+ const W=620,H=Math.max(250,50+items.length*24),cx=135,cy=H/2,R=105,r=62,tot=items.reduce((a,b)=>a+b.value,0);let a0=-Math.PI/2,s='';
+ const P=(a,rad)=>[cx+rad*Math.cos(a),cy+rad*Math.sin(a)];
+ for(const it of items){const a1=a0+2*Math.PI*it.value/tot;
+  if(it.value===tot)s+=`<circle cx="${cx}" cy="${cy}" r="${(R+r)/2}" fill="none" stroke="${it.color}" stroke-width="${R-r}"/>`;
+  else{const lg=a1-a0>Math.PI?1:0,[x1,y1]=P(a0,R),[x2,y2]=P(a1,R),[x3,y3]=P(a1,r),[x4,y4]=P(a0,r);
+   s+=`<path d="M${x1} ${y1}A${R} ${R} 0 ${lg} 1 ${x2} ${y2}L${x3} ${y3}A${r} ${r} 0 ${lg} 0 ${x4} ${y4}Z" fill="${it.color}" stroke="#fff" stroke-width="1.5"><title>${esc(it.label)}: ${fmtN(it.value)} (${fmtP(it.value/tot)})</title></path>`}
+  a0=a1}
+ s+=`<text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="22" font-weight="700" fill="#0b2e59">${fmtN(tot)}</text><text x="${cx}" y="${cy+17}" text-anchor="middle" font-size="11" fill="#6b7280">${esc(o.center||'mezun')}</text>`;
+ const ly=cy-items.length*12+6;items.forEach((it,i)=>{const y=ly+i*24;s+=`<rect x="270" y="${y-10}" width="12" height="12" rx="2" fill="${it.color}"/><text x="290" y="${y}" fill="#1f2937">${esc(it.label)}</text><text x="${W-14}" y="${y}" text-anchor="end" fill="#374151" font-weight="600">${fmtN(it.value)} · ${fmtP(it.value/tot)}</text>`});
+ return svgWrap(W,H,s,o.title)}
+
+function scatterChart(o){const pts=o.points.filter(p=>okN(p.x)&&okN(p.y));if(pts.length<3)return emptySVG(o.title);
+ const W=660,H=320,L=58,R=16,T=16,B=44,pw=W-L-R,ph=H-T-B;
+ let x0=Math.min(...pts.map(p=>p.x)),x1=Math.max(...pts.map(p=>p.x)),y0=Math.min(...pts.map(p=>p.y)),y1=Math.max(...pts.map(p=>p.y));
+ const px=(x1-x0)*.05||.1,py=(y1-y0)*.06||.1;x0-=px;x1+=px;y0-=py;y1+=py;const X=v=>L+pw*(v-x0)/(x1-x0),Y=v=>T+ph-ph*(v-y0)/(y1-y0);let s='';
+ for(let i=0;i<=5;i++){const v=y0+(y1-y0)*i/5,xv=x0+(x1-x0)*i/5;s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e6e9ef"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end" fill="#6b7280" font-size="10">${o.fy(v)}</text><text x="${X(xv)}" y="${T+ph+16}" text-anchor="middle" fill="#6b7280" font-size="10">${o.fx(xv)}</text>`}
+ for(const p of pts)s+=`<circle cx="${X(p.x).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="3.4" fill="${p.color||'#1d5fae'}" fill-opacity=".55"/>`;
+ const mx=mean(pts.map(p=>p.x)),my=mean(pts.map(p=>p.y)),sxy=pts.reduce((a,p)=>a+(p.x-mx)*(p.y-my),0),sxx=pts.reduce((a,p)=>a+(p.x-mx)**2,0),syy=pts.reduce((a,p)=>a+(p.y-my)**2,0);
+ if(sxx>0){const b=sxy/sxx,a=my-b*mx,rr=sxy/Math.sqrt(sxx*syy);const xa=x0+px,xb=x1-px;
+  s+=`<line x1="${X(xa)}" y1="${Y(a+b*xa)}" x2="${X(xb)}" y2="${Y(a+b*xb)}" stroke="#e4572e" stroke-width="2"/><text x="${W-R-4}" y="${T+12}" text-anchor="end" fill="#e4572e" font-size="11">r = ${fmtN(rr,2)} · n = ${pts.length}</text>`}
+ s+=`<text x="${L+pw/2}" y="${H-6}" text-anchor="middle" fill="#6b7280" font-size="11">${esc(o.xLabel)}</text><text transform="translate(13,${T+ph/2}) rotate(-90)" text-anchor="middle" fill="#6b7280" font-size="11">${esc(o.yLabel)}</text>`;
+ return svgWrap(W,H,s,o.title)}
+
+/* ====================== Kartlar ve dışa aktarma ====================== */
+const CARDS={
+ genel:[['durum','İzleme sonunda işgücü piyasası durumu','c'],['bulma','İlk işi bulma süresi (mezuniyet sonrası)','c'],['sektor','Çalışılan sektörler','c'],['isyeriIl','İşyerlerinin ili (ilk 12)','c'],
+  ['pozisyon','En sık pozisyonlar (ilk 12)','c'],['grup','Gruplara göre temel göstergeler','c'],['isveren','En çok mezun istihdam eden işyerleri','t',true]],
+ kohort:[['kohortTab','Kohortların karşılaştırması (ELA "Comparison of cohorts")','t',true],['empLine','Aylara göre istihdam oranı','c',true],
+  ['riwLine','Göreli Ücret Göstergesi (RIW) — kohortlara göre','c',true],['riuLine','Göreli İşsizlik Göstergesi (RIU) — kohortlara göre','c',true],['kohortBar','Kohortlara göre çalışma oranı ve 12. ay istihdamı','c']],
+ ucret:[['ucretTab','Çalışılan aylarda aylık brüt ücret — mezuniyetten sonraki yıllara göre','t',true],['ucretBar','Ortalama aylık brüt ücret: mezuniyet öncesi deneyime göre','c'],
+  ['riwBar','Göreli ücret (RIW): mezuniyet öncesi deneyime göre','c'],['ilTab','İkamet iline göre ücret ve işsizlik (ELA "Work & place of residence")','t',true],['ganoSc','GANO ile göreli ücret (RIW) ilişkisi','c']],
+ harita:[['haritaTab','Harita verisi','t',true]]
+};
+const NOTES={
+ durum:'İzleme sonu: mezuniyetten itibaren en çok 60 ay ya da 31.12.2025.',
+ bulma:'İlk sigortalı işe giriş ayına göre. "0" mezuniyetten önce ya da aynı ay işe başlayanları gösterir.',
+ grup:'Göreli ücret (RIW) %100 = ikamet ilinin ortalama brüt ücreti.',
+ riwLine:'RIW = medyan (bireysel aylık brüt ücret / ikamet ilinin ortalama brüt ücreti). Yalnızca o ay çalışanlar. Enflasyon ve bölgesel ücret farkını nötrler; kohortlar zaman içinde karşılaştırılabilir (ELA slayt 21–24).',
+ riuLine:'RIU = mezunların o ay İŞKUR\'da kayıtlı işsiz olma oranı / ikamet ilinin işsizlik oranı. 1\'in altı: mezunlar yerel ortalamadan daha düşük işsizlik riski taşıyor. Gölgeli bant: COVID-19 dönemi (2020 kohortu için ilk 12 ay).',
+ empLine:'Her ay için, o aya kadar izlenebilen mezunlar arasında sigortalı çalışanların payı. Bir kohortta 8\'den az mezun izlenebiliyorsa nokta çizilmez.',
+ ucretTab:'ELA yöntemi: ücret yalnızca mezunun gerçekten çalıştığı aylar üzerinden hesaplanır; o yıl hiç çalışmayanlar dışarıda kalır. Yıl, ancak tamamı izlenebildiyse hesaplanır.',
+ ilTab:'İl ortalama ücret ve işsizlik oranları temsilidir; gerçek kullanımda TÜİK il istatistikleriyle güncellenmelidir.',
+ ganoSc:'Her nokta bir mezun (izleme dönemi boyunca ortalama RIW). Kırmızı çizgi: doğrusal eğilim. Korelasyon nedensellik göstermez.'
+};
+function buildCards(){for(const tab in CARDS){$('#g-'+tab).innerHTML=CARDS[tab].map(([id,title,kind,wide])=>`<div class="card ${wide||kind==='c'&&/Line$/.test(id)?'wide':''}" id="card-${id}">
+ <div class="card-h"><h3>${esc(title)}</h3><div class="dl">${kind==='c'?`<button data-exp="${id}" data-kind="svg">SVG</button>`:''}<button data-exp="${id}" data-kind="csv">CSV</button><button data-exp="${id}" data-kind="xlsx">Excel</button></div></div>
+ <div class="${kind==='t'?'tw':''}" id="b-${id}"></div>${NOTES[id]?`<p class="note">${NOTES[id]}</p>`:''}</div>`).join('')}}
+
+function setChart(id,svg,headers,rows,title){EXP[id]={svg,headers,rows,title};const el=$('#b-'+id);if(el)el.innerHTML=svg}
+function setTable(id,headers,rows,fmts,title){EXP[id]={headers,rows,title};const el=$('#b-'+id);if(!el)return;
+ if(!rows.length){el.innerHTML='<div class="empty">Seçili filtrede veri yok</div>';return}
+ el.innerHTML=`<table><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((v,i)=>{const f=fmts&&fmts[i];
+  const t=f==='tl'?fmtTL(v):f==='pct'?fmtP(v):f==='n1'?fmtN(v,1):f==='n2'?fmtN(v,2):f==='int'?fmtN(v):esc(v??'–');return`<td class="${f&&f!=='txt'?'n':''}">${t}</td>`}).join('')}</tr>`).join('')}</tbody></table>`}
+
+const stamp=()=>new Date().toISOString().slice(0,10);
+function dlBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+function csvCell(v){if(v==null)return'';if(typeof v==='number')return isFinite(v)?String(Math.round(v*10000)/10000).replace('.',','):'';const s=String(v);return/[;"\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}
+function downloadCSV(name,headers,rows){const t='\ufeff'+[headers,...rows].map(r=>r.map(csvCell).join(';')).join('\r\n');dlBlob(new Blob([t],{type:'text/csv;charset=utf-8'}),name+'_'+stamp()+'.csv')}
+function cleanSheetName(s){return String(s).replace(/[\\\/\?\*\[\]:]/g,' ').slice(0,31)}
+function downloadXLSX(name,sheets){if(typeof XLSX==='undefined'){alert('Excel kitaplığı yüklenemedi (internet bağlantısı gerekir). CSV olarak indiriliyor.');sheets.forEach(s=>downloadCSV(name+'_'+s.name,s.headers,s.rows));return}
+ const wb=XLSX.utils.book_new();const used=new Set();
+ for(const s of sheets){let nm=cleanSheetName(s.name),i=2;while(used.has(nm))nm=cleanSheetName(s.name).slice(0,28)+'_'+i++;used.add(nm);
+  const ws=XLSX.utils.aoa_to_sheet([s.headers,...s.rows.map(r=>r.map(v=>(typeof v==='number'&&!isFinite(v))?null:v))]);
+  ws['!cols']=s.headers.map((h,j)=>({wch:Math.min(48,Math.max(String(h).length,...s.rows.slice(0,200).map(r=>String(r[j]??'').length))+2)}));XLSX.utils.book_append_sheet(wb,ws,nm)}
+ XLSX.writeFile(wb,name+'_'+stamp()+'.xlsx')}
+function downloadSVG(name,svg){const m=svg.match(/viewBox="0 0 (\S+) (\S+)"/);const out='<?xml version="1.0" encoding="UTF-8"?>\n'+svg.replace('width="100%"',`width="${m[1]}" height="${m[2]}"`);
+ dlBlob(new Blob([out],{type:'image/svg+xml;charset=utf-8'}),name+'_'+stamp()+'.svg')}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-exp]');if(!b)return;const id=b.dataset.exp,E=EXP[id];if(!E)return;const nm='iky_mezun_'+id;
+ if(b.dataset.kind==='svg')downloadSVG(nm,E.svg);else if(b.dataset.kind==='csv')downloadCSV(nm,E.headers,E.rows);else downloadXLSX(nm,[{name:E.title||id,headers:E.headers,rows:E.rows}])});
+
+/* ====================== Render ====================== */
+function renderKPIs(S){const k=[['Mezun sayısı',fmtN(S.n),'Filtrelenmiş kohortlar'],['İzleme sonunda çalışan',fmtP(S.empRate),'Ücretli + kendi hesabına'],
+ ['12. ayda istihdam',fmtP(S.emp12),'Mezuniyetten 12 ay sonra'],['Ort. iş bulma süresi',okN(S.ilkMean)?fmtN(S.ilkMean,1)+' ay':'–','Medyan: '+(okN(S.ilkMed)?fmtN(S.ilkMed,0)+' ay':'–')],
+ ['İşsizlik riski',fmtP(S.risk),'Kayıtlı işsiz geçen ayların ortalama payı'],['RIU',okN(S.riu)?fmtN(S.riu,2):'–','Göreli işsizlik (il = 1)'],['RIW',fmtP(S.riw,0),'Göreli ücret (il ort. = %100)'],
+ ['Alanla uyum',fmtP(S.alan),'Çalışanlar içinde İK pozisyonu'],['Lisansüstü',fmtP(S.lu),'Yüksek lisans/doktora kaydı']];
+ $('#kpis').innerHTML=k.map(([l,v,s])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div><div class="s">${s}</div></div>`).join('');
+ EXP.kpi={title:'Gostergeler',headers:['Gösterge','Değer','Açıklama'],rows:k}}
+
+function renderGenel(F){
+ const DC={'Ücretli çalışan':'#0b2e59','Kendi hesabına':'#00a3e0','Lisansüstü öğrenci':'#2a9d8f','Kayıtlı işsiz':'#e4572e','İşgücü dışı':'#f2a541'};
+ const dm=[...countBy(F,g=>g.durum)].sort((a,b)=>b[1]-a[1]);
+ setChart('durum',donutChart({items:dm.map(([l,v],i)=>({label:l,value:v,color:DC[l]||PAL[(i+5)%PAL.length]})),title:'İzleme sonu durumu'}),['Durum','Mezun sayısı','Pay'],dm.map(([l,v])=>[l,v,v/F.length]),'Durum');
+ const bins=[['0 (öncesinde/aynı ay)',g=>g.ilk===0],['1–3 ay',g=>g.ilk>=1&&g.ilk<=3],['4–6 ay',g=>g.ilk>=4&&g.ilk<=6],['7–12 ay',g=>g.ilk>=7&&g.ilk<=12],['13–24 ay',g=>g.ilk>=13&&g.ilk<=24],['25+ ay',g=>g.ilk>=25],['İş bulamadı',g=>g.ilk==null]];
+ const bv=bins.map(([l,f])=>F.filter(g=>f(g)).length);
+ setChart('bulma',barChart({cats:bins.map(b=>b[0]),series:[{name:'Mezun',values:bv,colors:bins.map((b,i)=>i===6?'#e4572e':'#1d5fae')}],rotate:true,title:'İlk işi bulma süresi',yLabel:'Mezun sayısı'}),['Süre','Mezun sayısı','Pay'],bins.map((b,i)=>[b[0],bv[i],F.length?bv[i]/F.length:null]),'Is bulma suresi');
+ const cal=F.filter(g=>g.calisiyor);
+ const sm=[...countBy(cal,g=>g.sektor)].sort((a,b)=>b[1]-a[1]);
+ setChart('sektor',barChart({horizontal:true,cats:sm.map(x=>x[0]),series:[{name:'Mezun',values:sm.map(x=>x[1]),colors:sm.map(x=>SEC_COLORS[x[0]]||'#6c757d')}],labelW:200,title:'Sektörler'}),['Sektör','Çalışan mezun','Pay'],sm.map(([k,v])=>[k,v,v/cal.length]),'Sektor');
+ const im=[...countBy(cal.filter(g=>g.il),g=>g.il)].sort((a,b)=>b[1]-a[1]).slice(0,12);
+ setChart('isyeriIl',barChart({horizontal:true,cats:im.map(x=>x[0]),series:[{name:'Mezun',values:im.map(x=>x[1]),color:'#00a3e0'}],labelW:120,title:'İşyeri ili'}),['İl','Çalışan mezun','Pay'],im.map(([k,v])=>[k,v,v/cal.length]),'Isyeri ili');
+ const pm=[...countBy(cal.filter(g=>g.poz),g=>g.poz)].sort((a,b)=>b[1]-a[1]).slice(0,12);
+ setChart('pozisyon',barChart({horizontal:true,cats:pm.map(x=>x[0]),series:[{name:'Mezun',values:pm.map(x=>x[1]),colors:pm.map(x=>IK_POZ.includes(x[0])||/İK|insan kaynak/i.test(x[0])?'#0b2e59':'#9aa5b1')}],labelW:220,title:'Pozisyonlar'}),['Pozisyon','Çalışan mezun'],pm,'Pozisyon');
+ const grp=[['Kadın',g=>g.cins==='Kadın'],['Erkek',g=>g.cins==='Erkek'],['I. Öğretim',g=>g.og==='I. Öğretim'],['II. Öğretim',g=>g.og==='II. Öğretim'],['Deneyimli',g=>g.den],['Deneyimsiz',g=>!g.den]].map(([n,f])=>[n,stats(F.filter(f))]).filter(x=>x[1].n>0);
+ setChart('grup',barChart({cats:grp.map(x=>x[0]),series:[{name:'Çalışma oranı',values:grp.map(x=>x[1].empRate),color:'#0b2e59'},{name:'Alanla uyum',values:grp.map(x=>x[1].alan),color:'#00a3e0'},{name:'RIW',values:grp.map(x=>x[1].riw),color:'#f2a541'}],fmt:v=>fmtP(v,0),title:'Gruplara göre göstergeler'}),
+  ['Grup','n','Çalışma oranı','Alanla uyum','RIW','İşsizlik riski','Ort. iş bulma (ay)'],grp.map(([n,s])=>[n,s.n,s.empRate,s.alan,s.riw,s.risk,s.ilkMean]),'Gruplar');
+ const em=new Map();for(const g of cal){if(!g.isyeri)continue;const k=g.isyeri+'|'+g.il;if(!em.has(k))em.set(k,{isyeri:g.isyeri,il:g.il,sektor:g.sektor,G:[]});em.get(k).G.push(g)}
+ const er=[...em.values()].sort((a,b)=>b.G.length-a.G.length).slice(0,20).map(e=>[e.isyeri,e.il,e.sektor,e.G.length,e.G.filter(g=>g.alan).length/e.G.length,median(e.G.map(g=>g.riw).filter(okN)),[...new Set(e.G.map(g=>g.y))].sort().join(', ')]);
+ setTable('isveren',['İşyeri','İl','Sektör','Mezun','Alanla uyum','Medyan RIW','Kohortlar'],er,['txt','txt','txt','int','pct','pct','txt'],'Isverenler')}
+
+function renderKohort(F){const ys=[...new Set(F.map(g=>g.y))].sort((a,b)=>b-a);
+ const rows=ys.map(y=>{const G=F.filter(g=>g.y===y),s=stats(G),N=obsMonths(y),ref=calYear(y,N);return[y,G.length,N,s.empRate,s.emp12,s.ilkMean,s.risk,s.riu,s.riw,s.medW,ref,s.alan,s.lu]});
+ setTable('kohortTab',['Kohort','Mezun','İzlenen ay','İzleme sonunda çalışan','12. ayda istihdam','Ort. iş bulma (ay)','İşsizlik riski','RIU','RIW','Son ay medyan brüt ücret','Ücret yılı','Alanla uyum','Lisansüstü'],
+  rows,['txt','int','int','pct','pct','n1','pct','n2','pct','tl','txt','pct','pct'],'Kohort ozet');
+ const E=monthlyByCohort(F,'emp');setChart('empLine',lineChart({x:E.x,series:E.series,fmt:v=>fmtP(v,0),xLabel:'Mezuniyetten sonraki ay',yLabel:'İstihdam oranı',title:'İstihdam oranı'}),E.headers,E.rows,'Istihdam aylik');
+ const W=monthlyByCohort(F,'riw');setChart('riwLine',lineChart({x:W.x,series:W.series,fmt:v=>fmtN(v,2),refY:1,refLabel:'İl ortalaması = 1',xLabel:'Mezuniyetten sonraki ay',yLabel:'RIW',title:'RIW'}),W.headers,W.rows,'RIW aylik');
+ const U=monthlyByCohort(F,'riu');setChart('riuLine',lineChart({x:U.x,series:U.series,fmt:v=>fmtN(v,2),refY:1,refLabel:'Yerel işsizlik oranı = 1',floor:0,band:ALL_YEARS.includes(2020)&&F.some(g=>g.y===2020)?[1,12]:null,xLabel:'Mezuniyetten sonraki ay',yLabel:'RIU',title:'RIU'}),U.headers,U.rows,'RIU aylik');
+ const asc=[...rows].reverse();
+ setChart('kohortBar',barChart({cats:asc.map(r=>String(r[0])),series:[{name:'İzleme sonunda çalışan',values:asc.map(r=>r[3]),color:'#0b2e59'},{name:'12. ayda istihdam',values:asc.map(r=>r[4]),color:'#00a3e0'}],fmt:v=>fmtP(v,0),max:1,title:'Kohortlar'}),
+  ['Kohort','İzleme sonunda çalışan','12. ayda istihdam'],asc.map(r=>[r[0],r[3],r[4]]),'Kohort bar')}
+
+function renderUcret(F){
+ const multi=new Set(F.map(g=>g.y)).size>1;
+ $('#ucretWarn').innerHTML=multi?'<div class="warn">Birden çok kohort seçili: nominal ₺ değerleri farklı yılların ücretlerini karıştırır (yüksek enflasyon dönemi). Kohortlar arası karşılaştırma için RIW sütunlarını kullanın ya da üstten tek bir mezuniyet yılı seçin.</div>':'';
+ const grp=[['d',g=>g.den],['y',g=>!g.den],['t',()=>true]],rows=[];
+ for(let k=1;k<=5;k++){const P={};for(const[nm,fn]of grp){const ws=[],rs=[];for(const g of F){if(!fn(g)||g.N<k*12)continue;let sw=0,sr=0,c=0;
+   for(let m=(k-1)*12+1;m<=k*12;m++)if(g.emp[m]&&g.wage[m]!=null){sw+=g.wage[m];sr+=g.ratio[m];c++}if(c){ws.push(sw/c);rs.push(sr/c)}}
+  P[nm]={a:mean(ws),m:median(ws),r:median(rs),n:ws.length}}
+  rows.push([`Mezuniyetten sonraki ${k}. yıl`,P.d.a,P.y.a,P.t.a,P.d.m,P.y.m,P.t.m,P.d.r,P.y.r,P.t.r,P.t.n])}
+ setTable('ucretTab',['Dönem','Ort. — deneyimli','Ort. — deneyimsiz','Ort. — toplam','Medyan — deneyimli','Medyan — deneyimsiz','Medyan — toplam','RIW — deneyimli','RIW — deneyimsiz','RIW — toplam','n (toplam)'],
+  rows,['txt','tl','tl','tl','tl','tl','tl','pct','pct','pct','int'],'Ucret tablosu');
+ const cats=rows.map((r,i)=>`${i+1}. yıl`);
+ setChart('ucretBar',barChart({cats,series:[{name:'Mezuniyet öncesi deneyimli',values:rows.map(r=>r[1]),color:'#0b2e59'},{name:'Deneyimsiz',values:rows.map(r=>r[2]),color:'#5cc0e8'}],fmt:fmtK,title:'Ortalama ücret',yLabel:'₺ / ay (brüt)'}),
+  ['Dönem','Deneyimli (₺)','Deneyimsiz (₺)','Toplam (₺)'],rows.map(r=>[r[0],r[1],r[2],r[3]]),'Ucret bar');
+ setChart('riwBar',barChart({cats,series:[{name:'Mezuniyet öncesi deneyimli',values:rows.map(r=>r[7]),color:'#0b2e59'},{name:'Deneyimsiz',values:rows.map(r=>r[8]),color:'#5cc0e8'}],fmt:v=>fmtP(v,0),title:'RIW'}),
+  ['Dönem','RIW deneyimli','RIW deneyimsiz','RIW toplam'],rows.map(r=>[r[0],r[7],r[8],r[9]]),'RIW bar');
+ const im=new Map();for(const g of F){if(!im.has(g.ikamet))im.set(g.ikamet,[]);im.get(g.ikamet).push(g)}
+ const ir=[...im].sort((a,b)=>b[1].length-a[1].length).map(([il,G])=>{const s=stats(G);return[il,G.length,s.empRate,s.riw,ilWage(il),s.risk,ilRate(il)/100,s.riu,IL[il]?'':'varsayılan']});
+ setTable('ilTab',['İkamet ili','Mezun','Çalışma oranı','RIW (medyan)','İl ort. brüt ücret 2025 (₺)','İşsizlik riski','İl işsizlik oranı','RIU','Not'],ir,['txt','int','pct','pct','tl','pct','pct','n2','txt'],'Il tablosu');
+ const pts=F.filter(g=>okN(g.gano)&&okN(g.riw)).map(g=>({x:g.gano,y:g.riw,color:g.den?'#0b2e59':'#00a3e0'}));
+ setChart('ganoSc',scatterChart({points:pts,fx:v=>fmtN(v,2),fy:v=>fmtP(v,0),xLabel:'GANO (koyu: mezuniyet öncesi deneyimli)',yLabel:'Ortalama RIW',title:'GANO-RIW'}),['mezun_id','GANO','Ortalama RIW','Deneyim'],F.filter(g=>okN(g.gano)&&okN(g.riw)).map(g=>[g.id,g.gano,g.riw,g.den?'Evet':'Hayır']),'GANO RIW')}
+
+/* ---- Harita ---- */
+let map=null,mLayer=null,legendCtl=null;
+function initMap(){if(map)return;if(typeof L==='undefined'){$('#map').innerHTML='<div class="empty">Leaflet kitaplığı yüklenemedi — harita için internet bağlantısı gerekir.</div>';return}
+ map=L.map('map',{zoomSnap:.5}).setView([39.2,34.8],6);
+ const esri=(svc,attr,mz)=>L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${svc}/MapServer/tile/{z}/{y}/{x}`,{maxZoom:mz||19,attribution:'Tiles &copy; Esri — '+attr});
+ const base={'Esri Sokak':esri('World_Street_Map','Esri, HERE, Garmin, USGS, OpenStreetMap katkıcıları'),'Esri Uydu':esri('World_Imagery','Esri, Maxar, Earthstar Geographics'),
+  'Esri Topoğrafik':esri('World_Topo_Map','Esri, HERE, Garmin, USGS'),'Esri Açık Gri':esri('Canvas/World_Light_Gray_Base','Esri, HERE, Garmin',16)};
+ base['Esri Sokak'].addTo(map);L.control.layers(base,null,{collapsed:true}).addTo(map);L.control.scale({imperial:false}).addTo(map);
+ mLayer=L.layerGroup().addTo(map);
+ L.marker(KAMPUS,{icon:L.divIcon({className:'',html:'<div style="font-size:22px;color:#e4572e;text-shadow:0 0 3px #fff">★</div>',iconSize:[22,22],iconAnchor:[11,13]})}).bindPopup('<b>Sakarya Üniversitesi</b><br>Esentepe Kampüsü · İşletme Fakültesi').addTo(map);
+ legendCtl=L.control({position:'bottomright'});legendCtl.onAdd=()=>{const d=L.DomUtil.create('div','legend');d.id='mapLegend';return d};legendCtl.addTo(map)}
+function renderHarita(F){
+ const W=F.filter(g=>g.calisiyor&&g.isyeri&&okN(g.lat)&&okN(g.lng)),mode=$('#mapMode').value,cmode=$('#mapColor').value;
+ const groups=new Map();for(const g of W){const k=mode==='il'?g.il:g.isyeri+'|'+g.il;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(g)}
+ const items=[...groups].map(([k,G])=>{const il=G[0].il,lat=mode==='il'?(IL[il]?.lat??mean(G.map(g=>g.lat))):G[0].lat,lng=mode==='il'?(IL[il]?.lng??mean(G.map(g=>g.lng))):G[0].lng;
+  const sec=[...countBy(G,g=>g.sektor)].sort((a,b)=>b[1]-a[1])[0][0],alan=G.filter(g=>g.alan).length/G.length;
+  return{ad:mode==='il'?il:G[0].isyeri,il,lat,lng,n:G.length,sec,alan,riw:median(G.map(g=>g.riw).filter(okN)),G}}).sort((a,b)=>b.n-a.n);
+ setTable('haritaTab',mode==='il'?['İl','Çalışan mezun','Baskın sektör','Alanla uyum','Medyan RIW','Enlem','Boylam']:['İşyeri','İl','Sektör','Çalışan mezun','Alanla uyum','Medyan RIW','Enlem','Boylam'],
+  items.map(i=>mode==='il'?[i.ad,i.n,i.sec,i.alan,i.riw,+i.lat.toFixed(4),+i.lng.toFixed(4)]:[i.ad,i.il,i.sec,i.n,i.alan,i.riw,i.lat,i.lng]),
+  mode==='il'?['txt','int','txt','pct','pct','n2','n2']:['txt','txt','txt','int','pct','pct','n2','n2'],'Harita verisi');
+ if(!map)return;mLayer.clearLayers();
+ const alanCol=a=>a>=.75?'#0b2e59':a>=.5?'#1fa3d9':a>=.25?'#f2a541':'#e4572e';
+ for(const it of items){const col=cmode==='alan'?alanCol(it.alan):(mode==='il'?'#0b2e59':(SEC_COLORS[it.sec]||'#6c757d'));
+  const rad=mode==='il'?7+Math.sqrt(it.n)*3.2:5+Math.sqrt(it.n)*3;
+  const poz=[...countBy(it.G,g=>g.poz)].sort((a,b)=>b[1]-a[1]).slice(0,4).map(([p,c])=>`${esc(p)} (${c})`).join('<br>');
+  const firms=mode==='il'?[...countBy(it.G,g=>g.isyeri)].sort((a,b)=>b[1]-a[1]).slice(0,6).map(([p,c])=>`${esc(p)} (${c})`).join('<br>'):'';
+  L.circleMarker([it.lat,it.lng],{radius:rad,color:'#fff',weight:1.2,fillColor:col,fillOpacity:.8})
+   .bindPopup(`<b>${esc(it.ad)}</b><br>${mode==='il'?'':esc(it.il)+' · '+esc(it.sec)+'<br>'}Çalışan mezun: <b>${it.n}</b><br>Alanla uyum: ${fmtP(it.alan,0)} · Medyan RIW: ${fmtP(it.riw,0)}<br>Kohortlar: ${[...new Set(it.G.map(g=>g.y))].sort().join(', ')}<hr style="margin:5px 0">${mode==='il'?'<b>İşyerleri</b><br>'+firms:'<b>Pozisyonlar</b><br>'+poz}`,{maxWidth:320})
+   .bindTooltip(`${esc(it.ad)} — ${it.n} mezun`).addTo(mLayer)}
+ const lg=$('#mapLegend');if(lg){lg.innerHTML=cmode==='alan'?'<b>Alanla uyum</b><br>'+[['≥ %75','#0b2e59'],['%50–74','#1fa3d9'],['%25–49','#f2a541'],['< %25','#e4572e']].map(([l,c])=>`<i style="background:${c}"></i>${l}`).join('<br>')
+  :mode==='il'?'<b>Daire</b>: il bazında<br>çalışan mezun sayısı':'<b>Sektör</b><br>'+Object.keys(SEC_COLORS).filter(s=>W.some(g=>g.sektor===s)).map(s=>`<i style="background:${SEC_COLORS[s]}"></i>${esc(s)}`).join('<br>')}
+ if(items.length){const b=L.latLngBounds(items.map(i=>[i.lat,i.lng]));b.extend(KAMPUS);map.fitBounds(b.pad(.12),{maxZoom:9})}}
+
+/* ---- Ham veri tablosu ---- */
+function renderHam(F){const q=$('#q').value.trim().toLocaleLowerCase('tr');
+ const R=F.filter(g=>!q||[g.id,g.isyeri,g.poz,g.il,g.sektor,g.durum,g.ikamet].join(' ').toLocaleLowerCase('tr').includes(q));
+ EXP.ham={title:'Mezun verisi',headers:COLS.map(c=>c[0]),rows:R.map(g=>{const o=toRaw(g);return COLS.map(c=>o[c[0]])})};
+ const PS=25,pages=Math.max(1,Math.ceil(R.length/PS));page=clamp(page,0,pages-1);const S=R.slice(page*PS,page*PS+PS);
+ $('#qInfo').textContent=`${fmtN(R.length)} kayıt`;$('#pInfo').textContent=`Sayfa ${page+1} / ${pages}`;
+ const H=['Kimlik','Kohort','Cinsiyet','Öğretim','GANO','Durum','İlk iş (ay)','İşyeri','Sektör','Pozisyon','İl','Son ay brüt (₺)','Ort. RIW'];
+ $('#hamTable').innerHTML=S.length?`<table><thead><tr>${H.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${S.map(g=>`<tr><td>${esc(g.id)}</td><td class="n">${g.y}</td><td>${esc(g.cins)}</td><td>${esc(g.og)}</td><td class="n">${fmtN(g.gano,2)}</td><td>${esc(g.durum)}</td><td class="n">${g.ilk??'–'}</td><td>${esc(g.isyeri||'–')}</td><td>${esc(g.isyeri?g.sektor:'–')}</td><td>${esc(g.poz||'–')}</td><td>${esc(g.il||'–')}</td><td class="n">${fmtTL(g.ucret)}</td><td class="n">${fmtP(g.riw,0)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">Kayıt yok</div>'}
+
+function renderAll(){const F=filtered();renderKPIs(stats(F));renderGenel(F);renderKohort(F);renderUcret(F);renderHarita(F);renderHam(F)}
+
+/* ---- Yöntem ---- */
+function renderYontem(){
+ const flow=svgWrap(900,250,`
+ <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0b2e59"/></marker></defs>
+ ${[[20,30,'YÖKSİS / SAÜ ÖBS','Mezun listesi + TC kimlik no','POL-on karşılığı'],[330,30,'SGK + İŞKUR','Aylık prim günleri, kazanç,','sigorta türü, işsizlik kaydı'],[640,30,'TÜİK','İl ort. ücret ve','işsizlik oranı (GUS karşılığı)'],
+   [175,150,'Takma adlandırma (KVKK)','TC no → P-kod; kimlik','bilgisi analiz ekibine gitmez'],[485,150,'Bölüm analiz ekibi','Otomatik raporlar, bu panel,','CSV/Excel/SVG çıktılar']]
+   .map(([x,y,a,b,c])=>`<rect x="${x}" y="${y}" width="240" height="72" rx="8" fill="#0b2e59"/><text x="${x+120}" y="${y+24}" text-anchor="middle" fill="#fff" font-weight="700">${a}</text><text x="${x+120}" y="${y+44}" text-anchor="middle" fill="#cfe3f5" font-size="11">${b}</text><text x="${x+120}" y="${y+60}" text-anchor="middle" fill="#cfe3f5" font-size="11">${c}</text>`).join('')}
+ <line x1="260" y1="66" x2="326" y2="66" stroke="#0b2e59" stroke-width="2" marker-end="url(#ar)"/><line x1="450" y1="102" x2="330" y2="148" stroke="#0b2e59" stroke-width="2" marker-end="url(#ar)"/>
+ <line x1="415" y1="186" x2="481" y2="186" stroke="#0b2e59" stroke-width="2" marker-end="url(#ar)"/><line x1="760" y1="102" x2="660" y2="148" stroke="#0b2e59" stroke-width="2" marker-end="url(#ar)"/>
+ <text x="450" y="242" text-anchor="middle" fill="#6b7280" font-size="11">ELA (OPI PIB) veri akışının SAÜ İKY uyarlaması — eşleştirme kimlik numarasıyla resmi kurum tarafında yapılır, bölüme takma adlı veri ulaşır</text>`,'Veri akışı');
+ EXP.akis={svg:flow,headers:['Adım','Kurum','İçerik'],rows:[[1,'YÖKSİS / SAÜ ÖBS','Mezun listesi + kimlik'],[2,'SGK + İŞKUR','Aylık istihdam, kazanç, işsizlik kaydı'],[3,'Takma adlandırma','Kimlik → P-kod'],[4,'TÜİK','İl ücret ve işsizlik'],[5,'Analiz ekibi','Raporlar ve panel']],title:'Veri akisi'};
+ $('#p-yontem').innerHTML=`<div class="card"><div class="card-h"><h3>Yöntem: ELA modelinin SAÜ İKY'ye uyarlanması</h3><div class="dl"><button data-exp="akis" data-kind="svg">SVG</button><button data-exp="akis" data-kind="csv">CSV</button></div></div>
+ ${flow}
+ <h4>Dayanak</h4><p>Panel, Polonya Mezun Takip Sistemi ELA'nın (Bożykowski &amp; Jasiński, OPI PIB) mantığını izler: anket yerine idari kayıtlarla <b>tüm mezun kitlesinin</b> izlenmesi, sonuçların otomatik raporlar, etkileşimli görseller ve toplulaştırılmış veri setleri olarak ücretsiz yayımlanması. Türkiye'de karşılık gelen kaynaklar YÖKSİS / üniversite öğrenci bilgi sistemi (POL-on), SGK hizmet ve kazanç kayıtları ile İŞKUR kayıtları (ZUS) ve TÜİK il istatistikleridir (GUS).</p>
+ <div class="warn">Bu karşılıklar bir tasarım önerisidir. SGK/İŞKUR kayıtlarının üniversiteyle eşleştirilmesi için kurumlar arası protokol ya da yasal dayanak ve KVKK uyumlu süreç gerekir. O aşamaya kadar aynı veri yapısı mezun anketi veya açık rızaya dayalı kariyer bilgileriyle doldurulabilir; "Veri yükle" düğmesi bu amaçla şablon sütunlarını kabul eder. Varsayılan demo verisi <b>tamamen sentetiktir</b>; işveren adları kurgusaldır, il ücret/işsizlik değerleri temsilidir.</div>
+ <h4>Gösterge tanımları (ELA slayt 20–23)</h4><ul>
+ <li><b>İş bulma süresi:</b> mezuniyetten ilk sigortalı işe kadar geçen ay.</li>
+ <li><b>İstihdam oranı (ay m):</b> m. ayı izlenebilen mezunlar içinde o ay sigortalı çalışanların payı.</li>
+ <li><b>İşsizlik riski:</b> mezunların İŞKUR'da kayıtlı işsiz geçirdiği ayların izlenen aylara oranının ortalaması.</li>
+ <li><b>Göreli İşsizlik Göstergesi (RIU):</b> işsizlik riski / mezunun ikamet ilindeki işsizlik oranı. 1'in altı, yerel ortalamadan daha düşük risk demektir.</li>
+ <li><b>Göreli Ücret Göstergesi (RIW):</b> Me( bireysel aylık brüt kazanç / ikamet ilinin ortalama brüt kazancı ). Enflasyonu ve bölgesel ücret farkını nötrleyerek kohortları <i>zaman</i> içinde, illeri ve kurumları <i>mekânda</i> karşılaştırılabilir kılar.</li>
+ <li><b>Ücret:</b> yalnızca çalışılan aylar üzerinden; çalışmayanlar ücret analizine girmez.</li>
+ <li><b>Alanla uyum:</b> ELA'nın gelecek sürümünde eklenen "meslek sınıflaması" karşılığı — çalışanlar içinde İK pozisyonundakilerin payı.</li></ul>
+ <h4>Rapor türleri (ELA slayt 16 uyarlaması)</h4>
+ <div class="tw"><table><thead><tr><th>Rapor</th><th>Bu paneldeki yeri</th></tr></thead><tbody>
+ <tr><td>Ücretler</td><td>Ücretler sekmesi — yıllara göre ortalama/medyan ve RIW</td></tr><tr><td>İş ve işsizlik</td><td>Genel Bakış ve Kohort sekmeleri</td></tr>
+ <tr><td>İş ve ikamet yeri</td><td>İkamet iline göre tablo + işyeri haritası</td></tr><tr><td>Mezuniyet öncesi deneyim</td><td>Ücret tablosu ve grup karşılaştırması</td></tr>
+ <tr><td>İş ve lisansüstü eğitim</td><td>Durum dağılımı, lisansüstü göstergesi</td></tr><tr><td>Kohortların karşılaştırması</td><td>Kohort sekmesi (aylık RIW/RIU/istihdam eğrileri)</td></tr></tbody></table></div>
+ <h4>Veri takvimi önerisi (ELA slayt 8)</h4><ul><li>Güz: veri yapısının ve değişken listesinin güncellenmesi.</li><li>31 Ocak'a kadar: 31 Aralık itibarıyla mezun listesinin çıkarılması.</li>
+ <li>Üç ay içinde: işgücü piyasası kayıtlarının eklenmesi ve takma adlandırma.</li><li>Yaz: mezun raporlarının bu panelde yayımlanması; isteğe bağlı derinlemesine analizler.</li></ul>
+ <h4>Veri yükleme şablonu</h4><div class="tw"><table><thead><tr><th>Sütun</th><th>Açıklama</th></tr></thead><tbody>${COLS.map(c=>`<tr><td><code>${c[0]}</code></td><td style="white-space:normal">${esc(c[1])}</td></tr>`).join('')}</tbody></table></div>
+ <p class="note">CSV ayıracı ; veya , olabilir; ondalıkta virgül kabul edilir. Yalnızca <code>mezuniyet_yili</code> zorunludur. Aylık seriler (istihdam, kayıtlı işsizlik, ücret) yüklenen satırlardan kurallı biçimde türetilir: işe başlama ayı, son çalışma ayı, işsizlik kayıt ayı ve son ay ücreti kullanılarak geriye doğru yıllık %7 göreli ücret artışı varsayılır. SGK aylık kaydı mevcutsa bu türetim doğrudan aylık veriyle değiştirilmelidir.</p></div>`}
+
+/* ---- CSV ayrıştırma ---- */
+function parseCSV(text){text=text.replace(/^\ufeff/,'');const first=text.split(/\r?\n/)[0]||'';const d=(first.match(/;/g)||[]).length>=(first.match(/,/g)||[]).length?';':',';
+ const rows=[];let row=[],cur='',q=false;for(let i=0;i<text.length;i++){const c=text[i];
+  if(q){if(c==='"'){if(text[i+1]==='"'){cur+='"';i++}else q=false}else cur+=c}
+  else if(c==='"')q=true;else if(c===d){row.push(cur);cur=''}else if(c==='\n'){row.push(cur);rows.push(row);row=[];cur=''}else if(c!=='\r')cur+=c}
+ if(cur!==''||row.length){row.push(cur);rows.push(row)}
+ const h=rows.shift()||[];return rows.filter(r=>r.some(x=>x!=='')).map(r=>Object.fromEntries(h.map((k,i)=>[k,r[i]??''])))}
+
+/* ---- Olaylar ---- */
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));
+ document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='p-'+t.dataset.tab));
+ if(t.dataset.tab==='harita'){initMap();setTimeout(()=>{if(map){map.invalidateSize();renderHarita(filtered())}},60)}});
+[['#fYil','yil'],['#fCins','cins'],['#fOg','og'],['#fDen','den'],['#fIl','il']].forEach(([s,k])=>$(s).onchange=e=>{ST[k]=e.target.value;page=0;renderAll()});
+$('#btnReset').onclick=()=>{Object.assign(ST,{yil:'all',cins:'all',og:'all',den:'all',il:'all'});['#fYil','#fCins','#fOg','#fDen','#fIl'].forEach(s=>$(s).value='all');page=0;renderAll()};
+$('#mapMode').onchange=$('#mapColor').onchange=()=>renderHarita(filtered());
+$('#q').oninput=()=>{page=0;renderHam(filtered())};
+$('#pPrev').onclick=()=>{page--;renderHam(filtered())};$('#pNext').onclick=()=>{page++;renderHam(filtered())};
+$('#btnUpload').onclick=()=>$('#fileIn').click();
+$('#fileIn').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{let raw;
+  if(/\.csv$/i.test(f.name))raw=parseCSV(await f.text());
+  else{if(typeof XLSX==='undefined')throw new Error('Excel okumak için SheetJS kitaplığı yüklenemedi; dosyayı CSV olarak kaydedip yükleyin.');
+   const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});raw=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''})}
+  const gs=raw.map((r,i)=>fromRaw(r,i+1)).filter(Boolean);if(!gs.length)throw new Error('Geçerli satır bulunamadı. En azından "mezuniyet_yili" sütunu gerekli (şablona bakın).');
+  loadRows(gs,f.name);alert(`${gs.length} mezun kaydı yüklendi (${raw.length-gs.length} satır atlandı).`)}catch(err){alert('Yükleme hatası: '+err.message)}e.target.value=''};
+$('#btnTemplate').onclick=()=>downloadCSV('iky_mezun_sablon',COLS.map(c=>c[0]),DATA.slice(0,5).map(g=>{const o=toRaw(g);return COLS.map(c=>o[c[0]])}));
+$('#btnDemo').onclick=()=>loadRows(genDemo().map((r,i)=>fromRaw(r,i+1)),'demo (sentetik)');
+$('#btnAllCsv').onclick=()=>{const F=filtered();downloadCSV('iky_mezun_verisi',COLS.map(c=>c[0]),F.map(g=>{const o=toRaw(g);return COLS.map(c=>o[c[0]])}))};
+$('#btnAllXlsx').onclick=()=>{const F=filtered();const sh=[{name:'Gostergeler',headers:EXP.kpi.headers,rows:EXP.kpi.rows},
+  {name:'Mezun_Verisi',headers:COLS.map(c=>c[0]),rows:F.map(g=>{const o=toRaw(g);return COLS.map(c=>o[c[0]])})}];
+ for(const id of ['kohortTab','ucretTab','ilTab','isveren','haritaTab','durum','bulma','sektor','isyeriIl','pozisyon','grup','empLine','riwLine','riuLine'])if(EXP[id])sh.push({name:EXP[id].title||id,headers:EXP[id].headers,rows:EXP[id].rows});
+ sh.push({name:'Sutun_Sozlugu',headers:['Sütun','Açıklama'],rows:COLS});downloadXLSX('iky_mezun_takip_raporu',sh)};
+
+buildCards();renderYontem();
+loadRows(genDemo().map((r,i)=>fromRaw(r,i+1)),'demo (sentetik)');
+</script>
+</body>
+</html>

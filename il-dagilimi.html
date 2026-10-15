@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>İl Dağılımı — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-sayfa="il">
+<section class="sayfa-bas"><div class="kap">
+  <a class="geri" href="index.html">← Anasayfaya dön</a>
+  <h1>İl Dağılımı</h1>
+  <p>Mezunların ikamet ettiği illere göre dağılım ve cinsiyet istatistikleri · <span id="ilSayisi"></span> il verisi</p>
+</div></section>
+
+<main><div class="kap">
+  <div class="izgara i3" id="ozet"></div>
+
+  <section class="bolum kart">
+    <div class="arac-satiri"><h3>Türkiye Haritası</h3>
+      <div class="sekmeler" id="donem"><button data-d="tum" class="aktif">Tüm Zamanlar</button><button data-d="yil">Bu Yıl</button></div></div>
+    <div id="harita"></div>
+  </section>
+
+  <section class="bolum kart">
+    <div class="arac-satiri"><h3>İlk 10 İl</h3>
+      <div class="sekmeler" id="tip"><button data-d="bar" class="aktif">📊 Bar</button><button data-d="yatay">📏 Yatay</button></div></div>
+    <div class="grafik-kutu" style="height:360px"><canvas id="gIl"></canvas></div>
+  </section>
+
+  <section class="bolum kart">
+    <div class="arac-satiri"><h3>Tüm İller — <span id="ilSayisi2"></span> İl</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <input type="search" id="ara" placeholder="İl ara…" style="width:180px;padding:7px 10px">
+        <button class="btn btn-cizgi" id="csv" type="button" style="padding:7px 12px">⬇ CSV</button>
+        <div class="sekmeler" id="sira"><button data-d="T" class="aktif">Tümü</button><button data-d="K">Kadına Göre</button><button data-d="E">Erkeğe Göre</button></div>
+      </div></div>
+    <div id="tablo"></div>
+  </section>
+</div></main>
+
+<script src="assets/veri.js"></script>
+<script src="assets/data.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/harita.js"></script>
+<script src="assets/bilesen.js"></script>
+<script>
+const V = MEZUN, Y = V.guncelYil;
+document.querySelector("#donem [data-d=yil]").textContent = Y + " Yılı";
+let donem="tum", tip="bar", sira="T";
+const veri = () => Object.fromEntries(Object.entries(V.iller).map(([il,a])=>[il, donem==="yil"?[a[2],a[3]]:[a[0],a[1]]]));
+function ciz(){
+  const v = veri(), dolu = Object.values(v).filter(([k,e])=>k+e>0).length;
+  let K=0,E=0; Object.values(v).forEach(([k,e])=>{K+=k;E+=e;});
+  document.getElementById("ilSayisi").textContent = document.getElementById("ilSayisi2").textContent = dolu;
+  document.getElementById("ozet").innerHTML =
+    KART.stat("İl Verisine Sahip Mezun",F.n(K+E),donem==="yil"?Y+" yılı":"Tüm zamanlar","",RENK.lacivert) +
+    KART.stat("Kadın",F.n(K),"Kadın · "+F.yuzde(K,K+E),"kadin",RENK.kadin) +
+    KART.stat("Erkek",F.n(E),"Erkek · "+F.yuzde(E,K+E),"erkek",RENK.erkek);
+  const satir = HARITA(document.getElementById("harita"), v, {etiketSayisi:14});
+  const ilk = satir.slice(0,10);
+  grafik("gIl",{type:"bar",data:{labels:ilk.map(r=>r.il),datasets:[{label:"Kadın",data:ilk.map(r=>r.k),backgroundColor:RENK.kadin},{label:"Erkek",data:ilk.map(r=>r.e),backgroundColor:RENK.erkek}]},
+    options:{indexAxis:tip==="yatay"?"y":"x",scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true}},plugins:{legend:{position:"bottom"}}}});
+  tablo();
+}
+function tablo(){
+  const q = document.getElementById("ara").value.trim().toLocaleLowerCase("tr-TR");
+  const v = Object.fromEntries(Object.entries(veri()).filter(([il])=>!q||il.toLocaleLowerCase("tr-TR").includes(q)));
+  ilTablosu(document.getElementById("tablo"), v, sira, true);
+}
+sekmeBagla(document.getElementById("donem"),d=>{donem=d;ciz();});
+sekmeBagla(document.getElementById("tip"),d=>{tip=d;ciz();});
+sekmeBagla(document.getElementById("sira"),d=>{sira=d;tablo();});
+document.getElementById("ara").oninput = tablo;
+document.getElementById("csv").onclick = ()=> F.csvIndir(`sau_mezun_il_dagilimi_${donem==="yil"?Y:"tum"}.csv`,
+  ["il","kadin","erkek","toplam"], Object.entries(veri()).sort((a,b)=>(b[1][0]+b[1][1])-(a[1][0]+a[1][1])).map(([il,[k,e]])=>[il,k,e,k+e]));
+ciz();
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mezun Portalı — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-sayfa="anasayfa">
+
+<section class="kahraman">
+  <div class="kap">
+    <div>
+      <span class="rozet" style="background:rgba(255,255,255,.14);color:#fff">İşletme Fakültesi · İKY Bölümü</span>
+      <h1 style="margin-top:14px">İnsan Kaynakları Yönetimi Mezun Portalı</h1>
+      <p>SAÜ İşletme Fakültesi İnsan Kaynakları Yönetimi Bölümü mezunlarının hikâyeleri, kariyer göstergeleri ve mezunlara özel hizmetler bir arada.</p>
+      <div class="mini-sayac">
+        <div><b id="kayitli">–</b><span>kayıtlı mezun</span></div>
+        <div><b id="yayin">–</b><span>yayımlanan içerik</span></div>
+      </div>
+      <div style="margin-top:24px;display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn btn-beyaz" href="giris.html">Mezun Girişi</a>
+        <a class="btn" style="color:#fff;border-color:rgba(255,255,255,.4)" href="istatistikler.html">Rakamlarla Mezunlarımız →</a>
+      </div>
+    </div>
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
+        <b>Rakamlarla Mezunlarımız</b><a href="istatistikler.html" style="color:#cfe0ff;font-size:13px">Tümü →</a>
+      </div>
+      <div class="izgara i2" id="rakamlar"></div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="kap">
+    <section class="bolum" style="margin-top:0">
+      <div class="bolum-bas"><h2>Mezun Vitrini</h2><a href="vitrin.html">Tümü →</a></div>
+      <div class="izgara i3" id="vitrin"></div>
+    </section>
+
+    <div class="izgara i2 bolum">
+      <section>
+        <div class="bolum-bas"><h2>Mezun Köşesi</h2><a href="kose.html">Tümü →</a></div>
+        <div class="izgara" id="kose"></div>
+      </section>
+      <section>
+        <div class="bolum-bas"><h2>Duyurular</h2><a href="duyurular.html">Tümü →</a></div>
+        <div class="izgara" id="duyurular"></div>
+      </section>
+    </div>
+
+    <section class="bolum kart">
+      <div class="arac-satiri"><div><h2 style="margin:0">Mezunlarımız ne yapıyor?</h2><span class="soluk" id="sonucAlt"></span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn btn-ana" href="takip.html">Mezun Takip Paneli →</a><a class="btn btn-cizgi" href="sonuclar.html">1. ve 5. yıl sonuçları →</a></div></div>
+      <div class="izgara i4" id="sonucOzet"></div>
+    </section>
+
+    <section class="bolum">
+      <div class="bolum-bas"><h2>Mezun Hizmetleri</h2></div>
+      <div class="izgara i3">
+        <a class="kart hizmet" id="diploma" target="_blank" rel="noopener"><span class="ikon">🎓</span><span><b>Diploma Talep</b><br><span class="soluk">Diploma ve diploma eki taleplerinizi çevrim içi iletin. (yeni sekmede açılır)</span></span></a>
+        <a class="kart hizmet" href="anketler.html"><span class="ikon">📝</span><span><b>Mezun İzleme Anketi</b><br><span class="soluk">Mezuniyet sonrası yolunuzu bizimle paylaşın (çevrim içi, giriş gerekir). <span style="text-decoration:underline" onclick="event.preventDefault();event.stopPropagation();location.href='belgeler/SAU_IKY_Mezun_Izleme_Anketi_v2.docx'">Word formunu indir</span></span></span></a>
+        <a class="kart hizmet" href="panel.html#kose"><span class="ikon">✍️</span><span><b>Mezun Köşesine Yaz</b><br><span class="soluk">Başarı hikâyenizi, etkinlik ya da iş ilanınızı paylaşın. Giriş yapmanız gerekir.</span></span></a>
+      </div>
+    </section>
+
+    <section class="bolum cta">
+      <div><h2>Mezunumuz musunuz?</h2><p style="margin:0;opacity:.9">Giriş yapın; profilinizi güncelleyin, mezun köşesine içerik gönderin, anketlere katılın.</p></div>
+      <a class="btn btn-beyaz" href="giris.html">Mezun Girişi</a>
+    </section>
+  </div>
+</main>
+
+<script src="assets/veri.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  const V = MEZUN, Y = V.guncelYil;
+  const T = V.toplam(), G = V.toplam({yil:Y});
+  document.getElementById("kayitli").textContent = F.n(V.kayitliMezun);
+  document.getElementById("yayin").textContent = F.n(V.kose.length);
+  document.getElementById("diploma").href = SITE.diplomaTalep;
+  const kutu = (et,s,a,c) => `<div style="background:rgba(255,255,255,.07);border-radius:12px;padding:12px 14px">
+     <div style="font-size:12px;opacity:.75;text-transform:uppercase;letter-spacing:.04em">${et}</div>
+     <div style="font-size:24px;font-weight:800;color:${c||'#fff'}">${s}</div><div style="font-size:12.5px;opacity:.75">${a}</div></div>`;
+  document.getElementById("rakamlar").innerHTML =
+    kutu("Toplam Mezun",F.n(T.T),"Tüm zamanlar") +
+    kutu(`${Y} Yılı Mezun`,F.n(G.T),"Güncel") +
+    kutu("Kadın Mezun",F.n(T.K),"Kadın · "+F.yuzde(T.K,T.T),"#ffb3d1") +
+    kutu("Erkek Mezun",F.n(T.E),"Erkek · "+F.yuzde(T.E,T.T),"#a9cdff");
+  document.getElementById("vitrin").innerHTML = V.kose.filter(x=>x.vitrin).slice(0,3).map(x=>KART.icerik(x)).join("");
+  document.getElementById("kose").innerHTML = V.kose.filter(x=>!x.vitrin).slice(0,2).map(x=>KART.icerik(x,false)).join("");
+  const so = V.sonucOzet(V.sonuclar.filter(x=>x.kohort===1));
+  if(!so.programSayisi) document.getElementById("sonucOzet").closest("section").remove(); else {
+  document.getElementById("sonucAlt").textContent = `${V.dalgaYili-1} mezunları, mezuniyetten 1 yıl sonra · ${F.n(so.yanit)} mezunun yanıtına göre`;
+  document.getElementById("sonucOzet").innerHTML =
+    KART.stat("Çalışıyor",F.oran(so.calisan),"Yanıt verenler arasında","",RENK.turkuaz) +
+    KART.stat("Alanında çalışıyor",F.oran(so.alanindaCalisan),"Çalışanlar arasında","",RENK.mavi) +
+    KART.stat("Eğitime devam",F.oran(so.egitimde),"Lisansüstü vb.","",RENK.amber) +
+    KART.stat("İlk işe geçiş",so.ilkIsAy.toLocaleString("tr-TR",{maximumFractionDigits:1})+" ay","Ortalama süre","",RENK.lacivert);
+  }
+  document.getElementById("duyurular").innerHTML = V.duyurular.slice(0,2).map(d=>KART.duyuru(d).replace('class="kart duyuru"','class="kart duyuru kisa"')).join("");
+</script>
+</body>
+</html>

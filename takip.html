@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mezun Takip Paneli — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .panel-cerceve{width:100%;height:calc(100vh - 150px);min-height:720px;border:1px solid var(--cizgi);border-radius:14px;background:#fff;box-shadow:var(--golge);display:block}
+  .bilgi-satir{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:12px}
+</style>
+</head>
+<body data-sayfa="takip">
+<section class="sayfa-bas" style="padding:24px 0 22px"><div class="kap">
+  <a class="geri" href="istatistikler.html">← Mezun İstatistikleri</a>
+  <h1>Mezun Takip Paneli</h1>
+  <p>Kohortlara göre iş bulma süresi, işsizlik riski, ücret, sektör ve işyeri dağılımı · ELA (Polonya) modelinin İKY Bölümü uyarlaması</p>
+</div></section>
+
+<main style="padding-top:18px"><div class="kap" style="max-width:1400px">
+  <div class="bilgi-satir">
+    <div class="uyari" style="flex:1;min-width:280px">Panel açılışta <b>sentetik demo veriyle</b> çalışır. Panelin <b>Veri yükle</b> düğmesiyle yüklediğiniz CSV/XLSX dosyası yalnızca tarayıcınızda işlenir, hiçbir yere gönderilmez. Veri şablonu, <a href="belgeler/SAU_IKY_Mezun_Izleme_Anketi_v2.docx" download>izleme anketinin</a> Ek A kodlama kılavuzundaki 22 sütunla aynıdır; çevrim içi anket de yanıtları bu şablonda dışa aktarır.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a class="btn btn-cizgi" href="takip/sau_iky_mezun_takip.html" target="_blank" rel="noopener">Tam ekran aç ↗</a>
+      <a class="btn btn-cizgi" href="yontem.html#takip">Yöntem notu</a>
+    </div>
+  </div>
+  <iframe class="panel-cerceve" src="takip/sau_iky_mezun_takip.html" title="SAÜ İKY Mezun Takip Paneli" loading="eager"></iframe>
+</div></main>
+
+<script src="assets/veri.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

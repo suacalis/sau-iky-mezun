@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mezun İzleme Anketi — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  fieldset.blok{border:1px solid var(--cizgi);border-radius:14px;padding:16px 18px;margin:0 0 16px;background:#fff}
+  fieldset.blok legend{font-weight:800;padding:0 6px;color:var(--lacivert)}
+  fieldset.blok legend .rozet{margin-left:6px;vertical-align:1px}
+  .bolum-not{font-size:13.5px;color:var(--soluk);margin:0 0 12px}
+  .soru{margin-bottom:16px} .soru>b{display:block;margin-bottom:4px;font-size:14.5px}
+  .soru .acik{font-size:12.5px;color:var(--soluk);margin-bottom:6px}
+  .ops{display:flex;flex-direction:column;gap:4px}
+  .ops.yatay{flex-direction:row;flex-wrap:wrap;gap:6px}
+  .ops label{font-weight:500;display:flex;gap:8px;align-items:flex-start;margin:0;font-size:14px;padding:3px 0}
+  .ops.yatay label{border:1px solid var(--cizgi);border-radius:9px;padding:6px 10px;align-items:center}
+  .ops input{width:auto;margin-top:3px}
+  .sira{display:flex;gap:10px;flex-wrap:wrap;align-items:end} .sira>div{min-width:120px}
+  .izgara-soru td,.izgara-soru th{text-align:center} .izgara-soru td:first-child{text-align:left}
+  .izgara-soru input{width:auto}
+  .gizli-akis{display:none}
+  .ilerleme{height:6px;background:#eef2f8;border-radius:6px;overflow:hidden;margin:10px 0 0} .ilerleme i{display:block;height:100%;background:var(--mavi);width:0;transition:width .2s}
+  .yapiskan{position:sticky;top:54px;z-index:5;background:var(--zemin);padding:8px 0}
+</style>
+</head>
+<body data-sayfa="anket">
+<section class="sayfa-bas"><div class="kap">
+  <a class="geri" href="panel.html">← Mezun Paneli</a>
+  <h1>Lisans Mezunları İzleme Anketi</h1>
+  <p>Sürüm 2 · Mezun Takip Sistemi (ELA uyarlaması) + HESA Graduate Outcomes modülleri</p>
+</div></section>
+
+<main><div class="kap" style="max-width:900px">
+  <div class="kart" style="margin-bottom:16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
+    <div><b>Kâğıt / Word formu</b><div class="soluk" style="font-size:13.5px">Anketin Word sürümü, araştırmacı kodlama kılavuzu (Ek A) ve HESA uyarlama notları (Ek B) ile birlikte.</div></div>
+    <a class="btn btn-cizgi" href="belgeler/SAU_IKY_Mezun_Izleme_Anketi_v2.docx" download>⬇ Word formunu indir (.docx)</a>
+  </div>
+  <div id="liste"></div>
+
+  <form id="anket" class="gizli" novalidate>
+    <div class="yapiskan"><div class="kart" style="padding:12px 16px">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:14px"><b>Referans haftası: <span id="refHafta"></span></b><span class="soluk" id="ilerlemeMetin"></span></div>
+      <div class="ilerleme"><i id="ilerleme"></i></div>
+    </div></div>
+
+    <fieldset class="blok"><legend>Katılımcı Bilgilendirme ve Açık Rıza</legend>
+      <p class="bolum-not">Bu anket, İnsan Kaynakları Yönetimi Bölümü lisans mezunlarının mezuniyet sonrasında ne yaptığını; çalışma, öğrenim, girişimcilik, bakım sorumluluğu ya da iş arama gibi farklı yolları ve bu yollardaki deneyimlerini anlamak amacıyla uygulanmaktadır. Bulgular programın geliştirilmesine, öğrencilerin kariyer kararlarına ve bölüm kalite süreçlerine katkı sağlar. Çekirdek bölümler yaklaşık 10 dakika, isteğe bağlı modüllerle 15 dakika sürer.</p>
+      <p class="bolum-not">Kişisel verileriniz 6698 sayılı KVKK kapsamında yalnızca bu amaçla işlenir. Kimlik ve iletişim bilgileriniz yanıtlarınızdan ayrı saklanır; analizlerde yalnızca takma ad kodu kullanılır. Sonuçlar yalnızca toplulaştırılmış biçimde yayımlanır; ücret yanıtları grup medyanı/ortalaması olarak raporlanır. İyi oluş soruları (I bölümü) isteğe bağlıdır. Katılım gönüllüdür; istediğiniz soruyu boş bırakabilir, dilediğiniz zaman çekilebilir ve verilerinizin silinmesini talep edebilirsiniz. <a href="kvkk.html" target="_blank">KVKK Aydınlatma Metni</a></p>
+      <div class="ops">
+        <label><input type="checkbox" name="riza"> <span><b>Yukarıdaki bilgilendirmeyi okudum; verilerimin belirtilen amaçla işlenmesine açık rıza veriyorum.</b> (zorunlu)</span></label>
+        <label><input type="checkbox" name="takipIzni"> <span>Bir sonraki izleme döneminde (yaklaşık 1 yıl sonra) anketi güncellemem için benimle iletişime geçilmesini kabul ediyorum.</span></label>
+      </div>
+      <div class="soru" data-goster="takipIzni" style="margin-top:8px"><b>E-posta</b><div class="acik">Yalnızca iletişim izni verdiyseniz; analiz dosyasına aktarılmaz.</div><input name="eposta" type="email" style="max-width:360px"></div>
+    </fieldset>
+
+    <fieldset class="blok"><legend>A. Mezuniyet Bilgileri</legend>
+      <div class="soru"><b>S1. Hangi yıl ve ayda mezun oldunuz?</b><div class="acik">Diploma tarihindeki ay ve yıl.</div>
+        <div class="sira"><div><label>Ay</label><select name="s1ay" data-ay></select></div><div><label>Yıl</label><select name="s1yil" data-yil></select></div></div></div>
+      <div class="soru"><b>S2. Hangi öğretim türünden mezun oldunuz?</b><div class="ops" data-tek="s2" data-ops="I. Öğretim (normal öğretim)|II. Öğretim (ikinci öğretim)"></div></div>
+      <div class="soru"><b>S3. Mezuniyet genel not ortalamanız (GANO, 4'lük sistem) nedir?</b><div class="acik">Tam hatırlamıyorsanız yaklaşık değer yazabilirsiniz.</div>
+        <input name="s3" inputmode="decimal" placeholder="ör. 3,12" style="max-width:140px"></div>
+      <div class="soru"><b>S4. Cinsiyetiniz</b><div class="ops yatay" data-tek="s4" data-ops="Kadın|Erkek|Belirtmek istemiyorum"></div></div>
+      <div class="soru"><b>S5. Mezun olmadan önce sigortalı (SGK kayıtlı) bir işte ücretli olarak çalıştınız mı?</b><div class="acik">Zorunlu staj ve gönüllü çalışmalar hariç; tam ya da kısmi süreli sigortalı işler dahil.</div>
+        <div class="ops yatay" data-tek="s5" data-ops="Evet|Hayır"></div></div>
+    </fieldset>
+
+    <fieldset class="blok"><legend>B. Referans Haftası İçindeki Faaliyetleriniz</legend>
+      <p class="bolum-not">Bu bölümdeki sorular, aksi belirtilmedikçe <b class="refHafta"></b> içinde ne yaptığınıza ilişkindir.</p>
+      <div class="soru"><b>S6. Referans haftası içinde hangi faaliyetlerde bulundunuz?</b><div class="acik">Uyan seçeneklerin TÜMÜNÜ işaretleyiniz.</div>
+        <div class="ops" data-coklu="s6" data-ops="Bir işverene bağlı ücretli çalışma (staj ücretli ve sigortalıysa dahil)|Serbest çalışma / freelance|Kendi işimi (şirketimi) yürütme|Mesleki portföy / proje geliştirme (ör. danışmanlık altyapısı, içerik üretimi)|Gönüllü ya da ücretsiz çalışma (ücretsiz staj dahil)|Öğrenim, eğitim ya da araştırma (lisansüstü, sertifika, dil kursu vb.)|Askerlik hizmeti|Sınava hazırlık (KPSS, ALES, YDS vb.)|Ücretsiz bakım sorumluluğu (çocuk, yaşlı, hasta yakını)|Seyahat / ara verme (kısa tatiller hariç)|İşsizim ve iş arıyorum – İŞKUR'a kayıtlıyım|İşsizim ve iş arıyorum – İŞKUR'a kayıtlı değilim|Başka bir şey"></div>
+        <input name="s6diger" placeholder="Başka bir şey (belirtiniz)" data-goster="s6:13" style="margin-top:6px"></div>
+      <div class="soru" id="s7kutu"><b>S7. Bu faaliyetlerden hangisini referans haftası içindeki EN ÖNEMLİ faaliyetiniz olarak görüyorsunuz?</b><div class="acik">En önemli faaliyet; gelecek planlarınızla en ilgili, size en çok gelir sağlayan ya da en çok zaman ayırdığınız faaliyet olabilir.</div>
+        <select name="s7" id="s7"></select></div>
+      <div class="soru"><b>S8. Referans haftası sonrasındaki bir ay içinde sözleşmeli olarak başlayacağınız bir iş ya da eğitim var mı?</b><div class="acik">Birden fazlası geçerliyse ikisini de işaretleyiniz.</div>
+        <div class="ops" data-coklu="s8" data-ops="Evet, bir ay içinde başlayacağım bir iş sözleşmem var|Evet, bir ay içinde başlayacağım bir eğitim/öğrenim var|Hayır"></div></div>
+      <div class="soru"><b>S9. Mezun olduktan sonra (ya da mezuniyet öncesinde başlayıp sonrasında sürdürdüğünüz) sigortalı bir işte en az bir ay çalıştınız mı?</b>
+        <div class="ops yatay" data-tek="s9" data-ops="Evet|Hayır"></div></div>
+    </fieldset>
+
+    <fieldset class="blok" data-akis="calisti"><legend>C. Çalışma Geçmişiniz (mezuniyetten bu yana)</legend>
+      <div class="soru"><b>S10. Mezuniyetten sonraki ilk sigortalı işinize hangi ay ve yılda başladınız?</b><div class="acik">Mezuniyet öncesinde başladığınız işe devam ettiyseniz kutuyu işaretleyiniz.</div>
+        <div class="sira" data-gizle="s10devam"><div><label>Ay</label><select name="s10ay" data-ay></select></div><div><label>Yıl</label><select name="s10yil" data-yil></select></div></div>
+        <div class="ops" style="margin-top:6px"><label><input type="checkbox" name="s10devam"> Mezuniyetten önce başladığım işte çalışmaya devam ettim</label></div></div>
+      <div class="soru"><b>S11. Mezuniyetinizden bu yana toplam kaç farklı işverende sigortalı olarak çalıştınız?</b><div class="acik">Şu anki işvereniniz dahil.</div>
+        <div class="ops yatay" data-tek="s11" data-ops="1|2|3|4|5 ve üzeri"></div></div>
+      <div class="soru" data-akis="calismiyor"><b>S12. Şu anda çalışmıyorsanız, en son çalıştığınız işten hangi ay ve yılda ayrıldınız?</b>
+        <div class="sira"><div><label>Ay</label><select name="s12ay" data-ay></select></div><div><label>Yıl</label><select name="s12yil" data-yil></select></div></div></div>
+      <div class="soru"><b>S13. Mezuniyetinizden bu yana İŞKUR'a kayıtlı işsiz olarak toplam yaklaşık kaç ay geçirdiniz?</b><div class="acik">Hiç kayıt olmadıysanız 0 yazınız.</div>
+        <input name="s13" inputmode="numeric" style="max-width:120px"> <span class="soluk">ay</span></div>
+    </fieldset>
+
+    <fieldset class="blok" data-akis="calisti"><legend>D. Ana İşiniz</legend>
+      <p class="bolum-not">Şu anda çalışıyorsanız referans haftası içindeki ANA işinizi, çalışmıyorsanız en son işinizi düşününüz. Ana iş; gelecek planlarınızla en ilgili, en çok kazandıran ya da en çok zaman ayırdığınız iştir.</p>
+      <div class="soru"><b>S14. Referans haftası içinde bir mi, birden fazla işte mi çalışıyordunuz?</b><div class="ops yatay" data-tek="s14" data-ops="Tek işte|Birden fazla işte"></div></div>
+      <div class="soru"><b>S15. İşyerinizin (kurum/şirket) adı</b><div class="acik">Paylaşmak istemiyorsanız yalnızca sektörü ve ili belirtmeniz yeterlidir. İşyeri adları raporlarda yalnızca toplu gösterilir.</div><input name="s15"></div>
+      <div class="soru"><b>S16. İşyeriniz esas olarak ne iş yapıyor?</b><div class="acik">Ör. "otomotiv yan sanayi parçası üretiyor", "işe alım danışmanlığı veriyor".</div><input name="s16"></div>
+      <div class="soru"><b>S17. İşyerinizin faaliyet gösterdiği sektör</b>
+        <div class="ops" data-tek="s17" data-ops="Otomotiv|İmalat (otomotiv dışı sanayi)|Tekstil|Gıda|Enerji|Bankacılık / Finans / Sigorta|Bilişim|Perakende|Lojistik|Danışmanlık / İK Hizmetleri (işe alım, bordro, eğitim firmaları)|Kamu (bakanlık, belediye, KİT vb.)|Eğitim|Sağlık|Turizm|Diğer"></div>
+        <input name="s17diger" placeholder="Diğer (belirtiniz)" data-goster="s17:15" style="margin-top:6px"></div>
+      <div class="soru"><b>S18. Pozisyonunuzun / unvanınızın adı</b><div class="acik">Ör. İK Uzman Yardımcısı, Bordro Uzmanı, Satış Temsilcisi.</div><input name="s18"></div>
+      <div class="soru"><b>S19. İşinizde esas olarak ne yapıyorsunuz?</b><div class="acik">Ana görevlerinizi kısaca yazınız.</div><textarea name="s19" rows="3"></textarea></div>
+      <div class="soru"><b>S20. İşinizin ağırlıklı içeriği insan kaynakları alanıyla (işe alım, bordro, eğitim, performans, ücret yönetimi, çalışma ilişkileri, iş sağlığı ve güvenliği vb.) ilgili mi?</b>
+        <div class="ops" data-tek="s20" data-ops="Evet, doğrudan İK işi yapıyorum|Kısmen (görevlerimin bir bölümü İK ile ilgili)|Hayır"></div></div>
+      <div class="soru"><b>S21. Resmî olarak sorumlu olduğunuz (yönettiğiniz) çalışanlar var mı?</b><div class="ops yatay" data-tek="s21" data-ops="Evet|Hayır"></div></div>
+      <div class="soru"><b>S22. Tam zamanlı mı, yarı zamanlı mı çalışıyorsunuz?</b><div class="acik">Çalışma süreniz değişkense referans haftasındaki durumunuzu esas alınız.</div><div class="ops yatay" data-tek="s22" data-ops="Tam zamanlı|Yarı zamanlı"></div></div>
+      <div class="soru"><b>S23. Çalışma biçiminizi en iyi hangisi tanımlıyor?</b>
+        <div class="ops" data-tek="s23" data-ops="Belirsiz süreli iş sözleşmesi|Belirli süreli sözleşme – 12 ay ya da daha uzun|Belirli süreli sözleşme – 12 aydan kısa|Geçici / mevsimlik iş|Çağrı üzerine çalışma (sabit saat yok)|Ücretli staj / işbaşı eğitim programı|Kamu kadrosu (memur / sözleşmeli personel)|Bağ-Kur (4/b) – kendi hesabına|Sigortasız çalışıyorum|Diğer / bilmiyorum"></div></div>
+      <div class="soru"><b>S24. İşyerinizin bulunduğu il ve ilçe</b><div class="acik">Haritada gösterim için kullanılır; açık adres istemiyoruz. Uzaktan çalışıyorsanız bağlı olduğunuz ofisin ilini yazınız.</div>
+        <div class="sira" data-gizle="s24yd"><div style="min-width:200px"><label>İl</label><select name="s24il" data-il></select></div><div style="min-width:200px"><label>İlçe</label><input name="s24ilce"></div></div>
+        <div class="ops" style="margin-top:6px"><label><input type="checkbox" name="s24yd"> Yurt dışı</label></div>
+        <input name="s24ulke" placeholder="Ülke" data-goster="s24yd" style="max-width:260px"></div>
+      <div class="soru"><b>S25. Bu işteki aylık BRÜT ücretiniz yaklaşık ne kadar?</b><div class="acik">Vergi ve kesintiler düşülmeden önceki tutar; prim, ikramiye ve yan haklar hariç. Brütü bilmiyorsanız net tutarı yazıp kutuyu işaretleyiniz; tutar vermek istemiyorsanız bir aralık seçiniz.</div>
+        <div class="sira"><div style="min-width:180px"><label>Tutar</label><input name="s25tutar" inputmode="numeric"></div>
+          <div><label>Para birimi</label><select name="s25pb"><option>TL</option><option>EUR</option><option>USD</option><option>GBP</option><option>Diğer</option></select></div></div>
+        <div class="ops" style="margin-top:6px"><label><input type="checkbox" name="s25net"> Yazdığım tutar NET ücrettir</label></div>
+        <div style="margin-top:8px"><label>Tutar yazmak istemiyorsanız (aylık brüt, TL)</label>
+          <select name="s25aralik" style="max-width:320px"><option value="">Seçin</option><option>30.000 ₺ altı</option><option>30.000 – 39.999 ₺</option><option>40.000 – 49.999 ₺</option><option>50.000 – 64.999 ₺</option><option>65.000 – 79.999 ₺</option><option>80.000 – 99.999 ₺</option><option>100.000 ₺ ve üzeri</option><option>Belirtmek istemiyorum</option></select></div></div>
+      <div class="soru"><b>S26. Bu işverende (ya da kendi işinizde) ne kadar süredir çalışıyorsunuz?</b>
+        <div class="sira"><div><label>Süre</label><select name="s26tip"><option value="">Seçin</option><option value="ay">12 aydan az</option><option value="yil">12 ay ya da daha fazla</option></select></div>
+          <div><label id="s26etiket">Ay / yıl</label><input name="s26deger" inputmode="numeric" style="max-width:100px"></div></div></div>
+      <div class="soru"><b>S27. Bu işi almak için İKY lisans diplomanız gerekli miydi?</b>
+        <div class="ops" data-tek="s27" data-ops="Evet: hem lisans düzeyi hem İKY/ilgili alan resmî bir şarttı|Evet: lisans düzeyi şarttı (alan fark etmiyordu)|Evet: İKY/ilgili alan şarttı|Resmî şart değildi ama avantaj sağladı|Hayır: diploma gerekli değildi|Bilmiyorum"></div></div>
+      <div class="soru"><b>S28. Bu işi neden kabul ettiniz?</b><div class="acik">Uyan seçeneklerin TÜMÜNÜ işaretleyiniz.</div>
+        <div class="ops" data-coklu="s28" data-ops="Kariyer planıma uyuyordu / tam istediğim türde bir işti|Aldığım en iyi iş teklifiydi|Kurum içinde ilerleme fırsatıydı|Bu tür işi sevip sevmeyeceğimi görmek istedim|Asıl istediğim işe ulaşmak için deneyim kazanmak istedim|Konumu uygundu|Ücreti iyiydi|Geçimimi sağlamak için|Borçlarımı ödemek için (öğrenim kredisi dahil)|Aile şirketinde çalışmak için"></div></div>
+      <div class="soru" id="s29kutu"><b>S29. Bunlardan EN ÖNEMLİ neden hangisiydi?</b><select name="s29" id="s29"></select></div>
+      <div class="soru"><b>S30. Bu işi nasıl buldunuz?</b><div class="acik">Uyan seçeneklerin TÜMÜNÜ işaretleyiniz.</div>
+        <div class="ops" data-coklu="s30" data-ops="SAÜ Kariyer Merkezi / kariyer günleri|Bölüm kaynakları (öğretim elemanı, bölüm duyuruları, mezun ağı)|Şirketin kendi internet sitesi|İşe alım / insan kaynakları danışmanlık firması|Çevrim içi iş ilanı siteleri (Kariyer.net, Yenibiris vb.)|Sosyal medya / profesyonel ağlar (LinkedIn vb.)|İŞKUR|Kamu sınavı (KPSS vb.)|Kendiliğinden (davetsiz) başvuru|Aile ve arkadaş çevresi|Daha önce orada çalışıyordum (staj, yarı zamanlı iş, işbaşı eğitim dahil)|Diğer"></div></div>
+    </fieldset>
+
+    <fieldset class="blok" data-akis="girisim"><legend>E. Kendi İşi / Serbest Çalışma <span class="rozet">isteğe bağlı modül</span></legend>
+      <div class="soru"><b>S31. İşletmenizin adı ve esas olarak ne iş yaptığı</b><div class="sira"><div style="flex:1;min-width:220px"><label>Ad</label><input name="s31ad"></div><div style="flex:2;min-width:240px"><label>Faaliyet</label><input name="s31faaliyet"></div></div></div>
+      <div class="soru"><b>S32. Referans haftası içinde tek başınıza mı çalışıyordunuz, çalışanlarınız var mıydı?</b>
+        <div class="ops yatay" data-tek="s32" data-ops="Tek başıma (çalışanım yok)|Çalışanlarım var"></div>
+        <input name="s32sayi" placeholder="Çalışan sayısı" inputmode="numeric" data-goster="s32:2" style="max-width:160px;margin-top:6px"></div>
+      <div class="soru"><b>S33. Neden serbest çalışmayı / kendi işinizi kurmayı seçtiniz?</b><div class="acik">Uyan TÜM seçenekleri işaretleyiniz.</div>
+        <div class="ops" data-coklu="s33" data-ops="Kariyer planıma uyuyordu / tam istediğim türde bir işti|Hiç iş teklifi almadım|İlgilendiğim sektörde ilerleme fırsatıydı|Bu tür işi sevip sevmeyeceğimi görmek istedim|Deneyim kazanmak istedim|İstediğim yerde çalışmama olanak tanıyordu|Kazancı iyiydi|Geçimimi sağlamak için|Borçlarımı ödemek için|Aile işinde çalışmak için"></div>
+        <label style="margin-top:8px">En önemli neden</label><select name="s33ana" id="s33ana"></select></div>
+      <div class="soru"><b>S34. İşletmeniz nasıl finanse edildi?</b><div class="acik">Uyan TÜM seçenekleri işaretleyiniz.</div>
+        <div class="ops" data-coklu="s34" data-ops="Kendi / aile birikimi|Kitle fonlaması|Banka kredisi|KOSGEB ya da diğer kamu destekleri|Melek yatırımcı / girişim sermayesi|Üniversite kuluçka merkezi / teknokent (ör. SAÜ Teknokent)|Diğer"></div></div>
+    </fieldset>
+
+    <fieldset class="blok"><legend>F. Lisansüstü ve İleri Eğitim</legend>
+      <div class="soru"><b>S35. Mezuniyetinizden bu yana herhangi bir öğrenim, eğitim ya da araştırma programına kayıt yaptırdınız mı ya da şu an devam ediyor musunuz?</b><div class="acik">Lisansüstü programlar, mesleki sertifikalar ve ikinci üniversite dahil; kısa seminerler hariç.</div>
+        <div class="ops" data-tek="s35" data-ops="Evet, şu anda devam ediyorum|Evet, tamamladım|Evet, ancak bıraktım|Hayır"></div></div>
+      <div data-akis="ogrenim">
+        <div class="soru"><b>S36. Hedeflediğiniz (ya da tamamladığınız) en yüksek nitelik türü</b>
+          <div class="ops" data-tek="s36" data-ops="Doktora|Tezli yüksek lisans|Tezsiz yüksek lisans / MBA|Lisansüstü sertifika programı|Mesleki yeterlilik belgesi (ör. İSG uzmanlığı, SMMM, uluslararası İK sertifikaları)|İkinci lisans / önlisans|Diğer|Resmî bir nitelik hedeflemiyorum"></div></div>
+        <div class="soru"><b>S37. Tam zamanlı mı, kısmi zamanlı mı öğrenim görüyorsunuz / gördünüz?</b><div class="ops yatay" data-tek="s37" data-ops="Tam zamanlı|Kısmi zamanlı (çalışırken / hafta sonu / uzaktan)"></div></div>
+        <div class="soru"><b>S38. Kayıtlı olduğunuz üniversite ya da kurum ve ülke</b><div class="sira"><div style="flex:2;min-width:220px"><label>Kurum</label><input name="s38kurum"></div><div style="flex:1;min-width:160px"><label>Ülke</label><input name="s38ulke" value="Türkiye"></div></div></div>
+        <div class="soru"><b>S39. Programın alanı</b>
+          <div class="ops" data-tek="s39" data-ops="İnsan kaynakları / çalışma ekonomisi ve endüstri ilişkileri|İşletme / yönetim / MBA|Psikoloji / örgütsel davranış|Hukuk|Diğer"></div></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="blok"><legend>G. İkamet</legend>
+      <div class="soru"><b>S40. Şu anda hangi il ve ülkede ikamet ediyorsunuz?</b><div class="acik">Ücret ve işsizlik göstergeleri ikamet ilinizin ortalamasıyla karşılaştırılır.</div>
+        <div class="sira"><div style="min-width:200px"><label>İl</label><select name="s40il" data-il></select></div><div style="min-width:200px"><label>Ülke (Türkiye dışıysa)</label><input name="s40ulke"></div></div></div>
+    </fieldset>
+
+    <fieldset class="blok"><legend>H. Mevcut Faaliyetinizin Değerlendirilmesi</legend>
+      <p class="bolum-not">"Mevcut faaliyetiniz" referans haftası içindeki ana işiniz, öğreniminiz ya da diğer faaliyetinizdir.</p>
+      <div class="tablo-sar izgara-soru" style="max-height:none" data-izgara="h" data-satirlar="Mevcut faaliyetim gelecek planlarıma uygun.|Mevcut faaliyetim anlamlı.|Lisans öğrenimimde öğrendiklerimi mevcut faaliyetimde kullanıyorum." data-sutunlar="K. katılıyorum|Katılıyorum|Kararsızım|Katılmıyorum|K. katılmıyorum"></div>
+      <p class="bolum-not" style="margin-top:8px">Anlamlılık; yaptığınız işin size, başkalarına ya da topluma ne kadar anlamlı geldiğiyle ilgilidir. Öğrendiklerinizi kullanma; alan bilgisini ve lisans öğreniminde kazandığınız diğer becerileri kapsar.</p>
+    </fieldset>
+
+    <fieldset class="blok"><legend>I. Öznel İyi Oluş <span class="rozet">isteğe bağlı modül</span></legend>
+      <p class="bolum-not">Ulusal istatistik kurumlarında yaygın kullanılan kısa iyi oluş ölçüsü. Yalnızca grup düzeyinde analiz edilir.</p>
+      <div class="soru"><b>S41. Bugünlerde hayatınızdan genel olarak ne kadar memnunsunuz?</b><div class="ops yatay" data-olcek10="s41"></div><div class="acik">0 = Hiç memnun değilim · 10 = Tamamen memnunum</div></div>
+      <div class="soru"><b>S42. Hayatta yaptığınız şeylerin ne ölçüde değerli olduğunu düşünüyorsunuz?</b><div class="ops yatay" data-olcek10="s42"></div><div class="acik">0 = Hiç değerli değil · 10 = Son derece değerli</div></div>
+      <div class="soru"><b>S43. Dün kendinizi ne kadar mutlu hissettiniz?</b><div class="ops yatay" data-olcek10="s43"></div><div class="acik">0 = Hiç mutlu değil · 10 = Son derece mutlu</div></div>
+      <div class="soru"><b>S44. Dün kendinizi ne kadar kaygılı hissettiniz?</b><div class="ops yatay" data-olcek10="s44"></div><div class="acik">0 = Hiç kaygılı değil · 10 = Son derece kaygılı</div></div>
+    </fieldset>
+
+    <fieldset class="blok"><legend>J. Program ve Üniversite Değerlendirmesi <span class="rozet">isteğe bağlı modül</span></legend>
+      <div class="soru"><b>S45. SAÜ İnsan Kaynakları Yönetimi lisans programını bir arkadaşınıza ya da meslektaşınıza önerme olasılığınız nedir?</b><div class="ops yatay" data-olcek10="s45"></div><div class="acik">0 = Hiç olası değil · 10 = Kesinlikle</div></div>
+      <div class="soru"><b>S46. Bu puanı neden verdiniz?</b><textarea name="s46" rows="3"></textarea></div>
+      <div class="soru"><b>S47. Lisans tercihinizi yeniden yapabilseydiniz aşağıdakileri yapma olasılığınız nedir?</b>
+        <div class="tablo-sar izgara-soru" style="max-height:none" data-izgara="s47" data-satirlar="Farklı bir bölüm okumak|Farklı bir üniversitede okumak|Farklı türde bir program (ör. önlisans, meslek yüksekokulu) seçmek|Tamamen farklı bir şey yapmak (ör. üniversiteye gitmemek)" data-sutunlar="Çok olası|Olası|Kararsızım|Olası değil|Hiç olası değil|Bilmiyorum"></div></div>
+      <div class="soru"><b>S48. Lisans programının sizi işgücü piyasasına hazırlama düzeyini nasıl değerlendirirsiniz?</b>
+        <div class="ops yatay" data-tek="s48" data-ops="1 – Çok yetersiz|2 – Yetersiz|3 – Orta|4 – Yeterli|5 – Çok yeterli"></div></div>
+      <div class="soru"><b>S49. Programda daha fazla yer verilmesini istediğiniz konular / beceriler nelerdir?</b><textarea name="s49" rows="3"></textarea></div>
+    </fieldset>
+
+    <fieldset class="blok"><legend>K. Destek ve İletişim Tercihleri</legend>
+      <div class="soru"><b>S50. SAÜ Kariyer Merkezi'nin ya da bölümün size kariyer desteği için ulaşmasını ister misiniz?</b><div class="ops yatay" data-tek="s50" data-ops="Evet|Hayır"></div></div>
+      <div class="soru"><b>S51. Mezunların kariyer gelişimine ilişkin gelecekteki araştırmalara davet edilmek ister misiniz?</b><div class="ops yatay" data-tek="s51" data-ops="Evet|Hayır"></div></div>
+      <div class="soru"><b>S52. Bu ankette verdiğiniz bilgilerle ilgili olarak bölümün sizinle iletişime geçmesini kabul ediyor musunuz?</b><div class="ops yatay" data-tek="s52" data-ops="Evet|Hayır"></div></div>
+    </fieldset>
+
+    <div id="m"></div>
+    <button class="btn btn-ana" type="submit">Anketi Gönder</button>
+    <button class="btn btn-cizgi" type="button" id="vazgec">Vazgeç</button>
+  </form>
+</div></main>
+
+<script src="assets/veri.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/anket-kodlama.js"></script>
+<script>
+const V = MEZUN, O = OTURUM.al(), $ = id => document.getElementById(id), f = $("anket");
+const DALGA = V.dalgaYili;
+const anahtar = () => "sau_mezun_anket_" + DALGA + "_" + (O&&O.no);
+const AYLAR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+
+// Referans haftası: bugünden önceki tam hafta (Pazartesi–Pazar)
+const bugun = new Date(); const gun = (bugun.getDay()+6)%7;
+const refBas = new Date(bugun); refBas.setDate(bugun.getDate()-gun-7); const refBit = new Date(refBas); refBit.setDate(refBas.getDate()+6);
+const refMetin = `${refBas.toLocaleDateString("tr-TR",{day:"numeric",month:"long"})} – ${refBit.toLocaleDateString("tr-TR",{day:"numeric",month:"long",year:"numeric"})}`;
+$("refHafta").textContent = refMetin; document.querySelectorAll(".refHafta").forEach(e=>e.textContent=refMetin+" haftası");
+
+// ---- Form bileşenlerini kur ----
+f.querySelectorAll("[data-tek]").forEach(d=>{ const n=d.dataset.tek; d.innerHTML=d.dataset.ops.split("|").map((o,i)=>`<label><input type="radio" name="${n}" value="${i+1}"> <span>${o}</span></label>`).join(""); });
+f.querySelectorAll("[data-coklu]").forEach(d=>{ const n=d.dataset.coklu; d.innerHTML=d.dataset.ops.split("|").map((o,i)=>`<label><input type="checkbox" name="${n}" value="${i+1}"> <span>${o}</span></label>`).join(""); });
+f.querySelectorAll("[data-olcek10]").forEach(d=>{ const n=d.dataset.olcek10; d.innerHTML=[...Array(11).keys()].map(i=>`<label><input type="radio" name="${n}" value="${i}"> ${i}</label>`).join(""); });
+f.querySelectorAll("[data-izgara]").forEach(d=>{ const n=d.dataset.izgara, sat=d.dataset.satirlar.split("|"), sut=d.dataset.sutunlar.split("|");
+  d.innerHTML=`<table><thead><tr><th></th>${sut.map(s=>`<th>${s}</th>`).join("")}</tr></thead><tbody>${sat.map((r,i)=>`<tr><td>${r}</td>${sut.map((_,j)=>`<td><input type="radio" name="${n}_${i+1}" value="${j+1}" aria-label="${r}: ${sut[j]}"></td>`).join("")}</tr>`).join("")}</tbody></table>`; });
+f.querySelectorAll("select[data-ay]").forEach(s=>{ s.add(new Option("—","")); AYLAR.forEach((a,i)=>s.add(new Option(a,i+1))); });
+f.querySelectorAll("select[data-yil]").forEach(s=>{ s.add(new Option("—","")); for(let y=bugun.getFullYear(); y>=2012; y--) s.add(new Option(y,y)); });
+f.querySelectorAll("select[data-il]").forEach(s=>{ s.add(new Option("Seçin","")); Object.keys(V.ilKoordinat).sort((a,b)=>a.localeCompare(b,"tr")).forEach(i=>s.add(new Option(i,i))); });
+
+const ops = n => f.querySelector(`[data-coklu="${n}"],[data-tek="${n}"]`).dataset.ops.split("|");
+const coklu = n => [...f.querySelectorAll(`input[name="${n}"]:checked`)].map(x=>+x.value);
+const tek = n => { const x=f.querySelector(`input[name="${n}"]:checked`); return x ? x.value : ""; };
+const deger = n => { const el=f.elements[n]; if(!el) return ""; if(el instanceof RadioNodeList) return tek(n); return el.type==="checkbox" ? el.checked : el.value; };
+
+function secimListesi(sel, kaynak, etiket){
+  const secili = coklu(kaynak), eski = sel.value, o = ops(kaynak);
+  sel.innerHTML = `<option value="">${etiket}</option>` + secili.map(i=>`<option value="${i}">${o[i-1]}</option>`).join("");
+  if(secili.includes(+eski)) sel.value = eski;
+  return secili.length;
+}
+function akis(){
+  const s6 = coklu("s6"), s9 = tek("s9"), s35 = tek("s35");
+  const calisiyor = s6.some(i=>i<=4);
+  const goster = {
+    calisti: s9==="1",
+    calismiyor: s9==="1" && !calisiyor,
+    girisim: s6.some(i=>i>=2&&i<=4),
+    ogrenim: ["1","2","3"].includes(s35)
+  };
+  f.querySelectorAll("[data-akis]").forEach(el=>el.classList.toggle("gizli-akis", !goster[el.dataset.akis]));
+  $("s7kutu").classList.toggle("gizli-akis", secimListesi($("s7"),"s6","Seçin") < 2);
+  $("s29kutu").classList.toggle("gizli-akis", secimListesi($("s29"),"s28","Seçin") < 2);
+  secimListesi($("s33ana"),"s33","Seçin");
+  // basit göster/gizle: data-goster="ad" (checkbox) ya da "ad:değer"
+  f.querySelectorAll("[data-goster]").forEach(el=>{ const [n,v]=el.dataset.goster.split(":"); const d=deger(n);
+    const ok = v===undefined ? !!d : (f.querySelector(`input[name="${n}"][type=checkbox]`) ? coklu(n).includes(+v) : d===v);
+    el.style.display = ok ? "" : "none"; });
+  f.querySelectorAll("[data-gizle]").forEach(el=>{ el.style.display = deger(el.dataset.gizle) ? "none" : ""; });
+  $("s26etiket").textContent = f.elements.s26tip.value==="yil" ? "Yaklaşık yıl" : "Ay";
+  // ilerleme: görünür sorulardan yanıtlananların payı
+  const sorular = [...f.querySelectorAll(".soru")].filter(s=>!s.closest(".gizli-akis") && s.offsetParent!==null);
+  const dolu = sorular.filter(s=>[...s.querySelectorAll("input,select,textarea")].some(i=>(i.type==="radio"||i.type==="checkbox") ? i.checked : (i.value && i.name!=="s38ulke")));
+  $("ilerleme").style.width = (dolu.length/Math.max(1,sorular.length)*100)+"%";
+  $("ilerlemeMetin").textContent = `${dolu.length} / ${sorular.length} soru yanıtlandı`;
+}
+f.addEventListener("change", akis); f.addEventListener("input", akis);
+
+function topla(){
+  const v = {};
+  [...new Set([...f.elements].map(e=>e.name).filter(Boolean))].forEach(n=>{
+    const el=f.elements[n];
+    if(el instanceof RadioNodeList){ v[n] = el[0].type==="checkbox" ? coklu(n) : tek(n); }
+    else v[n] = el.type==="checkbox" ? el.checked : el.value;
+  });
+  return v;
+}
+function yukle(v){
+  Object.entries(v).forEach(([n,d])=>{ const el=f.elements[n]; if(!el) return;
+    if(el instanceof RadioNodeList) [...el].forEach(x=>x.checked = Array.isArray(d) ? d.map(String).includes(x.value) : x.value===String(d));
+    else if(el.type==="checkbox") el.checked=!!d; else el.value=d; });
+}
+
+function liste(mesaj){
+  if(!O){
+    $("liste").innerHTML = `<div class="kart"><h3>Giriş yapmanız gerekir</h3><p class="soluk">Çevrim içi ankete katılmak için mezun hesabınızla giriş yapın. Dilerseniz yukarıdaki Word formunu indirip doldurabilirsiniz.</p><a class="btn btn-ana" href="giris.html">Mezun Girişi</a></div>`;
+    return;
+  }
+  let kayit=null; try{ kayit=JSON.parse(sessionStorage.getItem(anahtar())||"null"); }catch(e){}
+  const yil=+O.yil, ay = Math.max(0,(DALGA-yil)*12 + (bugun.getMonth()+1) - 6);
+  const takvim = [1,2,3,4,5].map(k=>{ const d=yil+k; const durum = d<DALGA?"Geçti":d===DALGA?(kayit?"Tamamlandı":"Açık"):"Planlandı";
+    return `<tr><td>${k}. yıl izlemesi</td><td>Ocak ${d}</td><td><span class="rozet ${durum==="Açık"?"amber":durum==="Tamamlandı"?"yesil":""}">${durum}</span></td></tr>`; }).join("");
+  const acik = DALGA-yil>=1 && DALGA-yil<=5;
+  $("liste").innerHTML = `${mesaj||""}<div class="izgara">
+    ${acik ? `<div class="kart" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div><span class="rozet ${kayit?"yesil":"amber"}">${kayit?"Tamamlandı":"Size özel · Açık"}</span>
+        <h3 style="margin:8px 0 4px">${DALGA} Lisans Mezunları İzleme Anketi</h3>
+        <span class="soluk">${yil} mezunu · mezuniyetten yaklaşık ${ay} ay sonra · çekirdek bölümler ~10 dk</span></div>
+      <button class="btn ${kayit?"btn-cizgi":"btn-ana"}" id="ac" type="button">${kayit?"Yanıtlarımı gör / güncelle":"Ankete katıl"}</button></div>`
+    : `<div class="kart"><h3 style="margin-top:0">Şu anda size açık bir anket yok</h3><p class="soluk" style="margin:0">İzleme anketi mezuniyetten sonraki 5 yıl boyunca her yıl Ocak ayında gönderilir.</p></div>`}
+    ${kayit ? `<div class="kart"><h3 style="margin-top:0">Yanıtlarınızın kodlanmış hâli</h3>
+      <p class="soluk" style="margin-top:0">Yanıtlarınız, Word formundaki Ek A kodlama kurallarıyla Mezun Takip Paneli'nin 22 sütunlu veri şablonuna dönüştürülür. Kimlik bilgisi yerine takma ad kodu (<b>${ANKET_KOD.takmaAd(O.no)}</b>) kullanılır.</p>
+      <div class="tablo-sar" style="max-height:260px" id="kodluTablo"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <button class="btn btn-cizgi" id="indirPanel" type="button">⬇ Panel şablonu (CSV)</button>
+        <button class="btn btn-cizgi" id="indirEk" type="button">⬇ Ek değişkenler (GO, CSV)</button>
+        <a class="btn btn-cizgi" href="takip.html">Mezun Takip Paneli'ne git →</a></div>
+      <p class="soluk" style="font-size:12.5px;margin-bottom:0">Prototipte bu dosyalar yalnızca sizin indirmeniz içindir; gerçek sistemde yanıtlar bölüme iletilir ve panele toplu olarak yüklenir.</p></div>` : ""}
+    <div class="kart"><h3 style="margin-top:0">İzleme takviminiz</h3>
+      <div class="tablo-sar" style="max-height:none"><table><thead><tr><th>Dalga</th><th>Gönderim</th><th>Durum</th></tr></thead><tbody>${takvim}</tbody></table></div>
+      <p class="soluk" style="font-size:13px;margin-bottom:0">Toplu sonuçlar <a href="takip.html">Mezun Takip Paneli</a> ve <a href="sonuclar.html">Mezuniyet Sonrası Sonuçlar</a> sayfalarında yayımlanır.</p></div>
+  </div>`;
+  if(acik) $("ac").onclick = ()=>{ $("liste").classList.add("gizli"); f.classList.remove("gizli"); doldur(kayit); scrollTo(0,0); };
+  if(kayit){
+    const satir = ANKET_KOD.panelSatiri(kayit, O), ek = ANKET_KOD.ekDegiskenler(kayit, O);
+    $("kodluTablo").innerHTML = `<table><thead><tr><th>Sütun</th><th>Değer</th></tr></thead><tbody>${ANKET_KOD.PANEL_SUTUNLARI.map(k=>`<tr><td><code>${k}</code></td><td>${F.esc(satir[k])}</td></tr>`).join("")}</tbody></table>`;
+    $("indirPanel").onclick = ()=> F.csvIndir(`iky_mezun_anket_${satir.mezun_id}.csv`, ANKET_KOD.PANEL_SUTUNLARI, [ANKET_KOD.PANEL_SUTUNLARI.map(k=>satir[k])]);
+    $("indirEk").onclick = ()=> F.csvIndir(`iky_mezun_anket_ek_${satir.mezun_id}.csv`, Object.keys(ek), [Object.values(ek)]);
+  }
+}
+function doldur(kayit){
+  f.reset();
+  if(kayit) yukle(kayit);
+  else {
+    f.elements.s1yil.value = O.yil; f.elements.s1ay.value = "6";
+    const og = /II\. Öğretim/.test(O.program) ? "2" : "1"; f.querySelector(`input[name=s2][value="${og}"]`).checked = true;
+    if(O.cinsiyet) { const c={Kadın:"1",Erkek:"2"}[O.cinsiyet]; if(c) f.querySelector(`input[name=s4][value="${c}"]`).checked = true; }
+    try{ const p=JSON.parse(sessionStorage.getItem("sau_mezun_profil_"+O.no)||"null"); if(p){ if(p.il) f.elements.s40il.value=p.il; if(p.ikametUlke&&p.ikametUlke!=="Türkiye") f.elements.s40ulke.value=p.ikametUlke; if(p.eposta) f.elements.eposta.value=p.eposta; } }catch(e){}
+  }
+  akis();
+}
+f.onsubmit = e=>{
+  e.preventDefault();
+  if(!f.elements.riza.checked){ $("m").innerHTML='<div class="hata" style="margin-bottom:12px">Göndermek için açık rıza kutusunu işaretleyin.</div>'; f.elements.riza.scrollIntoView({block:"center"}); return; }
+  if(!f.elements.s1yil.value){ $("m").innerHTML='<div class="hata" style="margin-bottom:12px">Lütfen mezuniyet yılınızı (S1) belirtin.</div>'; return; }
+  const v = topla(); v._dalga = DALGA; v._zaman = new Date().toISOString(); v._refHafta = refMetin;
+  if(!v.takipIzni) v.eposta = "";
+  try{ sessionStorage.setItem(anahtar(), JSON.stringify(v)); }catch(e){}
+  f.classList.add("gizli"); $("liste").classList.remove("gizli");
+  liste('<div class="basari" style="margin-bottom:14px">Katılımınız için teşekkür ederiz! Yanıtlarınız kaydedildi.</div>'); scrollTo(0,0);
+};
+$("vazgec").onclick = ()=>{ f.classList.add("gizli"); $("liste").classList.remove("gizli"); };
+liste();
+</script>
+</body>
+</html>

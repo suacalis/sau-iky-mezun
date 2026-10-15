@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mezun Girişi — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-sayfa="giris">
+<main><div class="kap">
+  <div class="giris-izgara">
+    <aside class="kart" style="align-self:start">
+      <div class="soluk" style="font-size:13px;font-weight:700" id="adimEtiket">ADIM 1 / 3</div>
+      <h3 style="margin-top:6px">Giriş adımları</h3>
+      <p class="soluk" style="margin-top:0">Üç kısa adımda mezun hesabınıza ulaşın</p>
+      <ol class="adimlar" id="adimlar">
+        <li class="aktif"><span class="no">1</span><span><b>Numara</b><br><span class="soluk" style="font-size:13.5px">Öğrenci numaranızı ya da T.C. kimlik numaranızı ve toplama sorusunun cevabını girin.</span></span></li>
+        <li><span class="no">2</span><span><b>Kimlik doğrulama</b><br><span class="soluk" style="font-size:13.5px">Bilgilerinizi seçerek ya da yazarak doğrulayın.</span></span></li>
+        <li><span class="no">3</span><span><b>Mezun paneli</b><br><span class="soluk" style="font-size:13.5px">Profil, iletişim ve kariyer bilgileriniz.</span></span></li>
+      </ol>
+      <hr style="border:0;border-top:1px solid var(--cizgi);margin:18px 0">
+      <a href="duyurular.html">Yardım al</a>
+    </aside>
+
+    <div class="kart">
+      <div class="uyari" style="margin-bottom:16px">Prototip: bu form hiçbir sunucuya veri göndermez. Denemek için öğrenci no <b>B171200001</b> ya da geçerli biçimde bir T.C. kimlik no (ör. <b>10000000146</b>) kullanın; doğrulama sorularında “ÖRNEK MEZUN” kaydı kullanılır.</div>
+
+      <!-- ADIM 1 -->
+      <section id="a1">
+        <h2>Giriş Yap</h2>
+        <p class="soluk">Öğrenci numaranızı girin. Numaranızı hatırlamıyorsanız T.C. kimlik numaranızla da devam edebilirsiniz.</p>
+        <div class="secim-ikili" id="yontem">
+          <button type="button" class="aktif" data-d="no"><b>Öğrenci No</b><span>Numaranızı biliyorsanız</span></button>
+          <button type="button" data-d="tc"><b>T.C. Kimlik No</b><span>Numaranızı unuttuysanız</span></button>
+        </div>
+        <form id="f1" novalidate>
+          <div class="alan"><label for="numara" id="numaraEt">Öğrenci Numarası</label>
+            <input id="numara" autocomplete="off" inputmode="text" maxlength="11">
+            <div class="ipucu" id="numaraIp">Öğrenci numaranız diplomanızda ve transkriptinizde yazar.</div></div>
+          <div class="alan"><label for="guv">Güvenlik Doğrulaması</label>
+            <div style="display:flex;gap:10px;align-items:center">
+              <canvas id="captcha" width="150" height="46" style="border:1px solid var(--cizgi);border-radius:10px;flex:none" aria-label="Toplama işlemi resmi"></canvas>
+              <button type="button" class="btn btn-cizgi" id="yenile" title="Yeni soru" aria-label="Yeni soru">⟲</button>
+              <input id="guv" inputmode="numeric" placeholder="Sonuç" style="max-width:120px">
+            </div></div>
+          <div id="h1"></div>
+          <button class="btn btn-ana" type="submit" style="margin-top:6px">Devam Et</button>
+        </form>
+        <p class="soluk" style="margin-top:18px;font-size:14px"><a href="yonetici-giris.html">Yönetici Girişi</a> · <a href="index.html">Ana Sayfa</a></p>
+      </section>
+
+      <!-- ADIM 2 -->
+      <section id="a2" class="gizli">
+        <h2>Kimliğinizi doğrulayın</h2>
+        <p class="soluk"><span id="kimlikOzet"></span> · <a href="giris.html">Değiştir</a></p>
+        <div class="secim-ikili" id="dogYontem">
+          <button type="button" class="aktif" data-d="sec"><b>Seçerek doğrula</b><span>Önerilen · klavye gerekmez</span></button>
+          <button type="button" data-d="yaz"><b>Yazarak doğrula</b><span>İstenen harfleri yazın</span></button>
+        </div>
+        <p class="soluk" id="dogAciklama" style="font-size:14px">Her soruda istenen karakterleri soldan sağa sırayla içeren seçeneği işaretleyin.</p>
+        <div id="sorular"></div>
+        <div id="trHarf" class="gizli soluk" style="font-size:13px;margin-bottom:10px"></div>
+        <p style="font-size:14px"><b id="tamam">0 / 4</b> tamamlandı · Kalan deneme hakkı <b id="hak">3</b> (iki yöntem için ortak)</p>
+        <div id="h2"></div>
+        <button class="btn btn-ana" type="button" id="dogrula">Doğrula ve Devam Et</button>
+        <p style="margin-top:14px"><a href="giris.html">Giriş sayfasına dön</a></p>
+      </section>
+
+      <!-- ADIM 2b: program seçimi -->
+      <section id="a3" class="gizli">
+        <h2>Programınızı seçin</h2>
+        <p class="soluk">Kimliğiniz doğrulandı. T.C. kimlik numaranıza bağlı birden fazla mezuniyet kaydı var; devam etmek istediğiniz programı seçin.</p>
+        <div id="programlar" class="izgara"></div>
+        <div class="basari" style="margin-top:14px">Öğrenci numaranızı not alın; bir dahaki girişte kullanabilirsiniz.</div>
+      </section>
+    </div>
+  </div>
+</div></main>
+
+<script src="assets/veri.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+// ---- Örnek kayıt (prototip) ----
+const KAYIT = {ad:"ÖRNEK", soyad:"MEZUN", cinsiyet:"Kadın", dogum:"03/1999", uyruk:"T.C.", kayitlar:[
+  {no:"B171200001", program:"İnsan Kaynakları Yönetimi (I. Öğretim)", birim:"İşletme Fakültesi · İnsan Kaynakları Yönetimi Bölümü", yil:2021}]};
+
+let yontem="no", cevap=0, hak=3, dogYontem="sec", secilenKayit=null;
+const $ = id => document.getElementById(id);
+
+function tcGecerli(t){
+  if(!/^[1-9]\d{10}$/.test(t)) return false;
+  const d=[...t].map(Number);
+  const c10=((d[0]+d[2]+d[4]+d[6]+d[8])*7-(d[1]+d[3]+d[5]+d[7]))%10;
+  const c11=d.slice(0,10).reduce((a,b)=>a+b,0)%10;
+  return ((c10+10)%10)===d[9] && c11===d[10];
+}
+function captcha(){
+  const a=2+Math.floor(Math.random()*8), b=1+Math.floor(Math.random()*9); cevap=a+b;
+  const c=$("captcha"), x=c.getContext("2d"); x.clearRect(0,0,c.width,c.height);
+  x.fillStyle="#f3f6fb"; x.fillRect(0,0,c.width,c.height);
+  for(let i=0;i<6;i++){ x.strokeStyle=`rgba(31,111,209,${.15+Math.random()*.2})`; x.beginPath(); x.moveTo(Math.random()*150,Math.random()*46); x.lineTo(Math.random()*150,Math.random()*46); x.stroke(); }
+  x.font="700 24px 'Plus Jakarta Sans',sans-serif"; x.fillStyle="#0b2c5f"; x.textBaseline="middle";
+  [...`${a} + ${b} =`].forEach((ch,i)=>{ x.save(); x.translate(14+i*16,23); x.rotate((Math.random()-.5)*.35); x.fillText(ch,0,0); x.restore(); });
+  $("guv").value="";
+}
+function adim(n){
+  $("adimEtiket").textContent = `ADIM ${n} / 3`;
+  [...$("adimlar").children].forEach((li,i)=>{ li.className = i+1<n?"bitti":i+1===n?"aktif":""; });
+}
+
+// Adım 1
+$("yontem").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+  yontem=b.dataset.d; $("yontem").querySelectorAll("button").forEach(x=>x.classList.toggle("aktif",x===b));
+  $("numaraEt").textContent = yontem==="no"?"Öğrenci Numarası":"T.C. Kimlik Numarası";
+  $("numaraIp").textContent = yontem==="no"?"Öğrenci numaranız diplomanızda ve transkriptinizde yazar.":"11 haneli T.C. kimlik numaranızı girin.";
+  $("numara").inputMode = yontem==="no"?"text":"numeric"; $("numara").value=""; $("numara").focus();
+});
+$("yenile").onclick = captcha;
+$("f1").onsubmit = e=>{
+  e.preventDefault();
+  const n=$("numara").value.trim().toUpperCase(), h=$("h1");
+  if(!n) return h.innerHTML='<div class="hata">Lütfen numaranızı girin.</div>';
+  if(yontem==="tc" && !tcGecerli(n)) return h.innerHTML='<div class="hata">T.C. kimlik numarası geçerli değil.</div>';
+  if(yontem==="no" && !KAYIT.kayitlar.some(k=>k.no===n)) return h.innerHTML='<div class="hata">Bu numarayla eşleşen mezun kaydı bulunamadı. (Prototipte örnek numara: B171200001)</div>';
+  if(+$("guv").value!==cevap){ captcha(); return h.innerHTML='<div class="hata">Güvenlik sorusunun cevabı hatalı. Yeni soruyu yanıtlayın.</div>'; }
+  h.innerHTML="";
+  secilenKayit = yontem==="no" ? KAYIT.kayitlar.find(k=>k.no===n) : null;
+  $("kimlikOzet").textContent = (yontem==="no"?"Öğrenci No ":"T.C. Kimlik No ") + n.slice(0,3)+"•••••"+n.slice(-2);
+  $("a1").classList.add("gizli"); $("a2").classList.remove("gizli"); adim(2); sorulariKur();
+};
+
+// Adım 2 — doğrulama soruları
+const tr = s => s.toLocaleUpperCase("tr-TR");
+const kayitP = () => (secilenKayit||KAYIT.kayitlar[0]);
+let SORULAR=[];
+function harfler(kelime, idx){ return idx.map(i=>kelime[i]).join(""); }
+function rastgeleHarf(n){ const A="ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ"; return Array.from({length:n},()=>A[Math.floor(Math.random()*A.length)]).join(""); }
+function sorulariKur(){
+  const p = tr(kayitP().program).replace(/[^A-ZÇĞİÖŞÜ]/g,"");
+  const tanim = [
+    ["Adınızın 1. ve 3. harfleri", tr(KAYIT.ad), [0,2]],
+    ["Soyadınızın 2. ve 4. harfleri", tr(KAYIT.soyad), [1,3]],
+    ["Mezun olduğunuz programın adının ilk 3 harfi", p, [0,1,2]],
+    ["Soyadınızın son 2 harfi", tr(KAYIT.soyad), [KAYIT.soyad.length-2, KAYIT.soyad.length-1]]
+  ];
+  SORULAR = tanim.map(([soru,k,idx])=>{ const dogru=harfler(k,idx); const s=new Set([dogru]); while(s.size<4) s.add(rastgeleHarf(idx.length)); return {soru,dogru,secenek:[...s].sort(()=>Math.random()-.5)}; });
+  cizSorular();
+}
+function cizSorular(){
+  $("dogAciklama").textContent = dogYontem==="sec" ? "Her soruda istenen karakterleri soldan sağa sırayla içeren seçeneği işaretleyin." : "Her soruda istenen karakterleri soldan sağa sırayla yazın.";
+  $("sorular").innerHTML = SORULAR.map((s,i)=>`<div class="dogrulama-soru"><b>${i+1}. ${s.soru}</b>
+    ${dogYontem==="sec" ? `<div class="secenekler">${s.secenek.map(o=>`<label><input type="radio" name="s${i}" value="${o}">${o}</label>`).join("")}</div>`
+      : `<input data-s="${i}" maxlength="${s.dogru.length}" style="margin-top:8px;max-width:160px;text-transform:uppercase;letter-spacing:.2em" autocomplete="off">`}</div>`).join("");
+  $("trHarf").classList.toggle("gizli", dogYontem!=="yaz");
+  $("trHarf").innerHTML = 'Klavyenizde Türkçe harf yoksa: <span class="harf-kutu" style="display:inline-flex">' + "ÇĞIİÖŞÜ".split("").map(h=>`<button type="button">${h}</button>`).join("") + '</span> → seçili kutuya eklenir';
+  $("trHarf").querySelectorAll("button").forEach(b=>b.onmousedown=e=>{ e.preventDefault(); const a=document.activeElement; if(a&&a.dataset&&a.dataset.s!==undefined&&a.value.length<+a.maxLength){ a.value+=b.textContent; ilerleme(); } });
+  $("sorular").querySelectorAll("input").forEach(i=>i.addEventListener("input",ilerleme));
+  ilerleme();
+}
+function yanitlar(){
+  return SORULAR.map((s,i)=> dogYontem==="sec" ? (document.querySelector(`input[name=s${i}]:checked`)||{}).value||"" : tr(document.querySelector(`input[data-s="${i}"]`).value.trim()));
+}
+function ilerleme(){ $("tamam").textContent = yanitlar().filter(x=>x).length + " / " + SORULAR.length; }
+$("dogYontem").querySelectorAll("button").forEach(b=>b.onclick=()=>{ dogYontem=b.dataset.d; $("dogYontem").querySelectorAll("button").forEach(x=>x.classList.toggle("aktif",x===b)); cizSorular(); });
+$("dogrula").onclick = ()=>{
+  const y = yanitlar();
+  if(y.some(x=>!x)) return $("h2").innerHTML='<div class="hata">Lütfen tüm soruları yanıtlayın.</div>';
+  if(y.every((x,i)=>x===SORULAR[i].dogru)){
+    $("h2").innerHTML="";
+    if(secilenKayit) return girisYap(secilenKayit);
+    if(KAYIT.kayitlar.length===1) return girisYap(KAYIT.kayitlar[0]);
+    $("a2").classList.add("gizli"); $("a3").classList.remove("gizli"); adim(3);
+    $("programlar").innerHTML = KAYIT.kayitlar.map((k,i)=>`<button type="button" class="kart hizmet" style="text-align:left;cursor:pointer;font-family:inherit" data-i="${i}"><span class="ikon">🎓</span><span><b>${k.program}</b><br><span class="soluk">${k.birim} · ${k.yil} · Öğrenci No: ${k.no}</span></span></button>`).join("");
+    $("programlar").querySelectorAll("button").forEach(b=>b.onclick=()=>girisYap(KAYIT.kayitlar[+b.dataset.i]));
+    return;
+  }
+  hak--; $("hak").textContent = hak;
+  if(hak<=0){ $("h2").innerHTML='<div class="hata">Deneme hakkınız doldu. Lütfen daha sonra tekrar deneyin ya da Öğrenci İşleri ile iletişime geçin.</div>'; $("dogrula").disabled=true; return; }
+  $("h2").innerHTML='<div class="hata">Bazı yanıtlar hatalı. Sorular yenilendi.</div>'; sorulariKur();
+};
+function girisYap(k){
+  OTURUM.kur({ad:KAYIT.ad, soyad:KAYIT.soyad, cinsiyet:KAYIT.cinsiyet, dogum:KAYIT.dogum, uyruk:KAYIT.uyruk, ...k});
+  location.href = "panel.html";
+}
+captcha();
+</script>
+</body>
+</html>

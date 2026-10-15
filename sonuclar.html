@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Program Sonuçları — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  th.siralanir{cursor:pointer;user-select:none} th.siralanir:hover{color:var(--mavi)}
+  tr.satir{cursor:pointer} tr.satir:hover td{background:#f7faff}
+  tr.detay td{background:#fbfcfe}
+  .gosterge{display:grid;grid-template-columns:150px 1fr 56px;gap:8px;align-items:center;font-size:13.5px;margin:6px 0}
+  .gosterge .cubuk{height:10px}
+  .gizli-hucre{color:var(--soluk);font-size:12.5px}
+</style>
+</head>
+<body data-sayfa="sonuc">
+<section class="sayfa-bas"><div class="kap">
+  <a class="geri" href="istatistikler.html">← Mezun İstatistikleri</a>
+  <h1>Mezuniyet Sonrası Sonuçlar</h1>
+  <p>İKY mezunlarımız mezuniyetten 1 ve 5 yıl sonra ne yapıyor? İstihdam, eğitim–iş uyumu, ilk işe geçiş süresi ve memnuniyet · <span id="dalga"></span></p>
+</div></section>
+
+<main><div class="kap">
+  <div class="uyari" style="margin-bottom:16px">Bu göstergeler aday öğrencilere rehberlik ve programların geliştirilmesi içindir, <b>programları sıralama amacı taşımaz</b>. Programların mezun profili, düzeyi ve hedeflediği iş piyasası farklıdır. Yanıt sayısı <b id="esik"></b>'un altındaki göstergeler kişilerin tanınmasını önlemek için yayımlanmaz. Tanımlar için <a href="yontem.html">Yöntem ve Tanımlar</a>.</div>
+
+  <div class="kart">
+    <div class="arac-satiri" style="margin-bottom:12px">
+      <div class="sekmeler" id="kohort"></div>
+      <button class="btn btn-cizgi" id="csv" type="button">⬇ CSV indir</button>
+    </div>
+    <div class="izgara i4" style="align-items:end">
+      <div><label for="fGrup">Birim grubu</label><select id="fGrup"><option value="">Tümü</option></select></div>
+      <div><label for="fBirim">Birim</label><select id="fBirim"><option value="">Tümü</option></select></div>
+      <div><label for="fEqf">Düzey (AYÇ/EQF)</label><select id="fEqf"><option value="">Tümü</option></select></div>
+      <div><label for="fIsced">Alan (ISCED-F 2013)</label><select id="fIsced"><option value="">Tümü</option></select></div>
+    </div>
+    <div style="margin-top:12px"><input type="search" id="fAra" placeholder="Program ara…" style="max-width:320px"></div>
+  </div>
+
+  <div class="izgara i4 bolum" style="margin-top:18px" id="ozet"></div>
+
+  <section class="bolum kart">
+    <div class="arac-satiri"><h3>Alana göre mezuniyet sonrası durum</h3><span class="soluk" style="font-size:13px">Yanıt sayısıyla ağırlıklı</span></div>
+    <div class="grafik-kutu" id="grafikKutu"><canvas id="gAlan"></canvas></div>
+  </section>
+
+  <section class="bolum">
+    <div class="bolum-bas"><h2>Programlar</h2><span class="soluk" id="adet"></span></div>
+    <div class="tablo-sar" style="max-height:none" id="tablo"></div>
+    <p class="soluk" style="font-size:13px">Satıra tıklayarak programın ayrıntılı göstergelerini açın. Sütun başlıklarına tıklayarak sıralayabilirsiniz.</p>
+  </section>
+</div></main>
+
+<script src="assets/veri.js"></script>
+<script src="assets/data.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/bilesen.js"></script>
+<script>
+const V = MEZUN, E = V.KUCUK_HUCRE, $ = id => document.getElementById(id);
+$("esik").textContent = E;
+$("dalga").textContent = V.dalgaYili + " izleme dalgası";
+let kohort = +(F.param("kohort")||1), sirala = {k:"birim", y:1}, acik = null;
+
+$("kohort").innerHTML = V.KOHORTLAR.map(k=>`<button data-d="${k.kod}" class="${k.kod===kohort?'aktif':''}" title="${k.aciklama}">${k.ad} · ${V.dalgaYili-k.kod} mezunları</button>`).join("");
+sekmeBagla($("kohort"), d=>{ kohort=+d; acik=null; ciz(); });
+
+V.gruplar().forEach(g=>$("fGrup").add(new Option(g,g)));
+V.TURLER.forEach(t=>$("fEqf").add(new Option(`${V.EQF[t]} — ${t}`, V.EQF[t])));
+[...new Set(V.sonuclar.map(s=>s.isced))].sort().forEach(c=>$("fIsced").add(new Option(`${c} ${V.ISCED[c]||""}`, c)));
+function birimDoldur(){
+  const g=$("fGrup").value, s=$("fBirim").value; $("fBirim").innerHTML='<option value="">Tümü</option>';
+  V.birimler.filter(b=>!g||b.grup===g).forEach(b=>$("fBirim").add(new Option(b.ad,b.ad)));
+  if([...$("fBirim").options].some(o=>o.value===s)) $("fBirim").value=s;
+}
+birimDoldur();
+if(V.birimler.length<2){ $("fGrup").parentElement.style.display="none"; $("fBirim").parentElement.style.display="none"; }
+$("fGrup").onchange = ()=>{ birimDoldur(); ciz(); };
+["fBirim","fEqf","fIsced"].forEach(id=>$(id).onchange=ciz);
+$("fAra").oninput = ciz;
+
+function filtreli(){
+  const g=$("fGrup").value, b=$("fBirim").value, q=$("fEqf").value, i=$("fIsced").value, a=$("fAra").value.trim().toLocaleLowerCase("tr-TR");
+  return V.sonuclar.filter(s=>s.kohort===kohort && (!g||s.grup===g) && (!b||s.birim===b) && (!q||String(s.eqf)===q) && (!i||s.isced===i)
+    && (!a||s.program.toLocaleLowerCase("tr-TR").includes(a)));
+}
+const yay = s => s.yanit >= E;
+const ay = x => x==null ? "—" : x.toLocaleString("tr-TR",{maximumFractionDigits:1}) + " ay";
+const puan = x => x==null ? "—" : x.toLocaleString("tr-TR",{minimumFractionDigits:1,maximumFractionDigits:1}) + " / 5";
+
+const SUTUN = [
+  ["program","Program",s=>`<b>${F.esc(s.program)}</b><div class="soluk" style="font-size:12px">${F.esc(s.birim)} · AYÇ ${s.eqf} · ${s.isced} ${V.ISCED[s.isced]||""}</div>`],
+  ["mezun","Mezun",s=>F.n(s.mezun),"sag"],
+  ["yanitOrani","Yanıt",s=>`${F.n(s.yanit)} <span class="soluk">(${F.oran(s.yanitOrani)})</span>`,"sag"],
+  ["calisan","Çalışan",s=>F.oran(s.calisan),"sag",1],
+  ["alanindaCalisan","Alanında çalışan¹",s=>F.oran(s.alanindaCalisan),"sag",1],
+  ["duzeyineUygun","Düzeyine uygun işte¹",s=>F.oran(s.duzeyineUygun),"sag",1],
+  ["ilkIsAy","İlk işe geçiş",s=>ay(s.ilkIsAy),"sag",1],
+  ["programMemnuniyeti","Program memnuniyeti",s=>puan(s.programMemnuniyeti),"sag",1]
+];
+
+function ciz(){
+  const l = filtreli();
+  const o = V.sonucOzet(l);
+  $("ozet").innerHTML =
+    KART.stat("Çalışan", F.oran(o.programSayisi?o.calisan:null), `Lisansüstüne devam: ${F.oran(o.programSayisi?o.egitimde:null)}`, "", RENK.turkuaz) +
+    KART.stat("Alanında çalışan¹", F.oran(o.programSayisi?o.alanindaCalisan:null), `Düzeyine uygun işte: ${F.oran(o.programSayisi?o.duzeyineUygun:null)}`, "", RENK.mavi) +
+    KART.stat("İlk işe geçiş", o.programSayisi?ay(o.ilkIsAy):"—", "Ortalama süre", "", RENK.amber) +
+    KART.stat("Yanıt", F.n(o.yanit), `${F.n(o.mezun)} mezundan · ${F.oran(o.mezun?o.yanit/o.mezun:null)} yanıt oranı`, "", RENK.lacivert);
+
+  // Alan grafiği
+  const alanlar = {}; l.filter(yay).forEach(s=>{ (alanlar[s.isced] = alanlar[s.isced]||[]).push(s); });
+  const kod = Object.keys(alanlar).sort();
+  const oz = kod.map(k=>V.sonucOzet(alanlar[k]));
+  $("grafikKutu").style.height = Math.max(220, kod.length*34+80) + "px";
+  grafik("gAlan",{type:"bar",data:{labels:kod.map(k=>`${V.ISCED[k]||k}`),datasets:[
+    {label:"Çalışıyor",data:oz.map(x=>+(x.calisan*100).toFixed(1)),backgroundColor:RENK.turkuaz},
+    {label:"Eğitime devam",data:oz.map(x=>+(x.egitimde*100).toFixed(1)),backgroundColor:RENK.mavi},
+    {label:"Diğer / iş arıyor",data:oz.map(x=>+((1-x.calisan-x.egitimde)*100).toFixed(1)),backgroundColor:"#cdd6e3"}]},
+    options:{indexAxis:"y",scales:{x:{stacked:true,max:100,ticks:{callback:v=>"%"+v}},y:{stacked:true,grid:{display:false}}},
+      plugins:{legend:{position:"bottom"},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: %${c.raw.toLocaleString("tr-TR")}`}}}}});
+
+  // Tablo
+  const r = l.slice().sort((a,b)=>{
+    const k=sirala.k;
+    if(k==="birim") return a.birim.localeCompare(b.birim,"tr")||a.program.localeCompare(b.program,"tr");
+    if(k==="program") return sirala.y*a.program.localeCompare(b.program,"tr");
+    const va = (yay(a)||["mezun","yanitOrani"].includes(k)) ? a[k] : -Infinity, vb = (yay(b)||["mezun","yanitOrani"].includes(k)) ? b[k] : -Infinity;
+    return sirala.y*(vb-va);
+  });
+  $("adet").textContent = `${l.length} program · ${l.filter(s=>!yay(s)).length} tanesinde yanıt yetersiz`;
+  $("tablo").innerHTML = `<table><thead><tr>${SUTUN.map(([k,ad,,c])=>`<th class="siralanir ${c||""}" data-k="${k}">${ad}${sirala.k===k?(sirala.y>0?" ▾":" ▴"):""}</th>`).join("")}</tr></thead><tbody>
+    ${r.map((s,i)=>{
+      const id = s.birim+"|"+s.program;
+      return `<tr class="satir" data-id="${F.esc(id)}">${SUTUN.map(([k,,f,c,gizle])=>`<td class="${c||""}">${gizle&&!yay(s)?'<span class="gizli-hucre">yetersiz yanıt</span>':f(s)}</td>`).join("")}</tr>`
+       + (acik===id ? `<tr class="detay"><td colspan="${SUTUN.length}">${detay(s)}</td></tr>` : "");
+    }).join("") || `<tr><td colspan="${SUTUN.length}" class="soluk">Bu filtrelere uyan program yok.</td></tr>`}</tbody></table>
+    <p class="soluk" style="font-size:12.5px;padding:8px 10px;margin:0">¹ Çalışanlar arasında, mezunun kendi değerlendirmesine göre (öz-değerlendirme).</p>`;
+  $("tablo").querySelectorAll("th.siralanir").forEach(th=>th.onclick=()=>{ const k=th.dataset.k; sirala = {k, y: sirala.k===k ? -sirala.y : 1}; ciz(); });
+  $("tablo").querySelectorAll("tr.satir").forEach(tr=>tr.onclick=()=>{ acik = acik===tr.dataset.id ? null : tr.dataset.id; ciz(); });
+}
+
+function detay(s){
+  if(!yay(s)) return `<div class="soluk">Bu kohortta ${F.n(s.yanit)} mezun yanıt verdi. Kişilerin tanınmasını önlemek için ${E} yanıtın altındaki göstergeler yayımlanmaz.</div>`;
+  const g = (ad,x,renk) => `<div class="gosterge"><span>${ad}</span><div class="cubuk"><i style="width:${(x*100).toFixed(1)}%;background:${renk}"></i></div><b>${F.oran(x)}</b></div>`;
+  return `<div class="izgara i2">
+    <div>${g("Çalışıyor",s.calisan,RENK.turkuaz)}${g("Eğitime devam",s.egitimde,RENK.mavi)}${g("İş arıyor",s.issiz,"#d1495b")}
+      ${g("Alanında çalışan",s.alanindaCalisan,RENK.mavi)}${g("Düzeyine uygun işte",s.duzeyineUygun,RENK.mavi)}${g("Yurt dışında",s.yurtDisinda,RENK.amber)}</div>
+    <div style="font-size:14px">
+      <p style="margin:4px 0"><b>Kohort:</b> ${s.mezuniyetYili} mezunları (${V.KOHORTLAR.find(k=>k.kod===s.kohort).aciklama.toLocaleLowerCase("tr-TR")})</p>
+      <p style="margin:4px 0"><b>İlk işe geçiş:</b> ortalama ${ay(s.ilkIsAy)}</p>
+      <p style="margin:4px 0"><b>İş memnuniyeti:</b> ${puan(s.isMemnuniyeti)} · <b>Program memnuniyeti:</b> ${puan(s.programMemnuniyeti)}</p>
+      <p style="margin:4px 0"><b>En sık sektörler:</b> ${s.sektorler.map(F.esc).join(", ")}</p>
+      <p style="margin:4px 0" class="soluk">Yanıt: ${F.n(s.yanit)} / ${F.n(s.mezun)} mezun (${F.oran(s.yanitOrani)}). Yanıt oranı düşük olduğunda sonuçlar yanlı olabilir.</p>
+    </div></div>`;
+}
+
+$("csv").onclick = ()=>{
+  const l = filtreli();
+  const b = ["izleme_dalgasi","kohort_yil","mezuniyet_yili","birim_grubu","birim","program","duzey","ayc_eqf","isced_f_2013","mezun_sayisi","yanit_sayisi","yanit_orani",
+    "calisan_orani","egitime_devam_orani","is_arayan_orani","alaninda_calisan_orani","duzeyine_uygun_orani","ilk_ise_gecis_ay","is_memnuniyeti_5","program_memnuniyeti_5","yurt_disinda_orani"];
+  const r4 = x => x==null?"":Math.round(x*10000)/10000;
+  F.csvIndir(`sau_mezun_program_sonuclari_${V.dalgaYili}_${kohort}yil.csv`, b, l.map(s=>{
+    const gz = !yay(s), v = x => gz ? "" : r4(x);
+    return [V.dalgaYili,s.kohort,s.mezuniyetYili,s.grup,s.birim,s.program,s.tur,s.eqf,s.isced,s.mezun,s.yanit,r4(s.yanitOrani),
+      v(s.calisan),v(s.egitimde),v(s.issiz),v(s.alanindaCalisan),v(s.duzeyineUygun),gz?"":Math.round(s.ilkIsAy*10)/10,v(s.isMemnuniyeti),v(s.programMemnuniyeti),v(s.yurtDisinda)];
+  }));
+};
+ciz();
+</script>
+</body>
+</html>

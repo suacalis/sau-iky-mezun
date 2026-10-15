@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Program Bazlı Mezun Dağılımı — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-sayfa="birim">
+<section class="sayfa-bas"><div class="kap">
+  <a class="geri" href="index.html">← Anasayfaya dön</a>
+  <h1>Program Bazlı Mezun Dağılımı</h1>
+  <p>Öğretim türü (I. ve II. öğretim) ve mezuniyet yılı bazında cinsiyet dağılımı</p>
+</div></section>
+
+<main><div class="kap">
+  <div class="izgara i3" id="ozet"></div>
+
+  <section class="bolum kart">
+    <div class="arac-satiri"><h3>Öğretim Türü Karşılaştırması</h3>
+      <div class="sekmeler" id="grupTip"><button data-d="yatay" class="aktif">📏 Yatay</button><button data-d="bar">📊 Bar</button><button data-d="doughnut">⭕ Halka</button></div></div>
+    <div class="grafik-kutu"><canvas id="gGrup"></canvas></div>
+  </section>
+
+  <section class="bolum kart" id="yillik">
+    <div class="arac-satiri"><h3>Yıllara Göre Mezun Sayısı</h3>
+      <div class="sekmeler" id="yilTip"><button data-d="bar" class="aktif">📊 Bar</button><button data-d="line">📈 Çizgi</button></div></div>
+    <div class="izgara i2" style="margin-bottom:14px">
+      <div><label for="selBirim">Birim</label><select id="selBirim"><option value="">Tüm Bölüm</option></select></div>
+      <div><label for="selProg">Bölüm / Program</label><select id="selProg" disabled><option value="">Önce birim seçin</option></select></div>
+    </div>
+    <div class="grafik-kutu"><canvas id="gYil"></canvas></div>
+    <div id="yilTablo" style="margin-top:14px"></div>
+    <p class="soluk" style="font-size:13px;margin:10px 0 0">Mezuniyet tarihi kayıtlı olan mezunlar sayılmıştır; bu nedenle toplam, genel toplamdan biraz az olabilir.</p>
+  </section>
+
+  <div style="margin-top:28px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><div id="gruplar" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    <button class="btn btn-ana" id="csvProg" type="button" style="margin-left:auto">⬇ Program tablosu (CSV)</button>
+    <button class="btn btn-cizgi" id="csvYil" type="button">⬇ Yıllık seri (CSV)</button></div>
+  <div id="birimler"></div>
+</div></main>
+
+<script src="assets/veri.js"></script>
+<script src="assets/data.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/bilesen.js"></script>
+<script>
+const V = MEZUN, T = V.toplam();
+document.getElementById("ozet").innerHTML =
+  KART.stat("Toplam Mezun",F.n(T.T),"Tüm zamanlar","",RENK.lacivert) +
+  KART.stat("Kadın",F.n(T.K),"Kadın · "+F.yuzde(T.K,T.T),"kadin",RENK.kadin) +
+  KART.stat("Erkek",F.n(T.E),"Erkek · "+F.yuzde(T.E,T.T),"erkek",RENK.erkek);
+
+// Grup karşılaştırma
+const G = V.birimler.flatMap(b=>b.programlar.map(p=>({g:p.ad.replace(/^.*\((.*)\)$/,"$1"),...V.toplam({program:p.ad})})));
+let grupTip="yatay";
+function grupCiz(){
+  if(grupTip==="doughnut"){
+    grafik("gGrup",{type:"doughnut",data:{labels:G.map(x=>x.g),datasets:[{data:G.map(x=>x.T),backgroundColor:RENK.seri}]},options:{cutout:"58%",plugins:{legend:{position:"right"}}}});
+  } else {
+    grafik("gGrup",{type:"bar",data:{labels:G.map(x=>x.g),datasets:[{label:"Kadın",data:G.map(x=>x.K),backgroundColor:RENK.kadin},{label:"Erkek",data:G.map(x=>x.E),backgroundColor:RENK.erkek}]},
+      options:{indexAxis:grupTip==="yatay"?"y":"x",scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true}},plugins:{legend:{position:"bottom"}}}});
+  }
+}
+sekmeBagla(document.getElementById("grupTip"),d=>{grupTip=d;grupCiz();}); grupCiz();
+
+// Yıllık
+const selB = document.getElementById("selBirim"), selP = document.getElementById("selProg");
+V.gruplar().forEach(g=>{ const og=document.createElement("optgroup"); og.label=g; V.birimler.filter(b=>b.grup===g).forEach(b=>og.appendChild(new Option(b.ad,b.ad))); selB.appendChild(og); });
+let yilTip="bar";
+function yilCiz(){
+  const s = V.yilSerisi({birim:selB.value||undefined, program:selP.value||undefined});
+  grafik("gYil",{type:yilTip,data:{labels:s.map(x=>x.yil),datasets:[
+    {label:"Kadın",data:s.map(x=>x.K),backgroundColor:RENK.kadin,borderColor:RENK.kadin,tension:.3},
+    {label:"Erkek",data:s.map(x=>x.E),backgroundColor:RENK.erkek,borderColor:RENK.erkek,tension:.3}]},
+    options:{interaction:{mode:"index",intersect:false},scales:{x:{stacked:yilTip==="bar",grid:{display:false}},y:{stacked:yilTip==="bar"}},plugins:{legend:{position:"bottom"}}}});
+  const r = s.slice().reverse();
+  document.getElementById("yilTablo").innerHTML = `<div class="tablo-sar" style="max-height:360px"><table><thead><tr><th>Yıl</th><th class="sag">Kadın</th><th class="sag">Erkek</th><th class="sag">Toplam</th><th class="sag">Önceki yıla göre</th><th>Cinsiyet</th></tr></thead><tbody>
+    ${r.map((x,i)=>{ const o=r[i+1]; const d=o?x.T-o.T:null; const dp=o&&o.T?((x.T-o.T)/o.T*100):null;
+      return `<tr><td>${x.yil}</td><td class="sag">${F.n(x.K)}</td><td class="sag">${F.n(x.E)}</td><td class="sag"><b>${F.n(x.T)}</b></td>
+      <td class="sag" style="color:${d>0?'#0b7c78':d<0?'#b3261e':'inherit'}">${d===null?"—":(d>0?"▲ +":d<0?"▼ ":"")+F.n(d)+(dp!==null?` (${dp.toLocaleString("tr-TR",{maximumFractionDigits:1})}%)`:"")}</td><td>${F.cubuk(x.K,x.E)}</td></tr>`;}).join("")}</tbody></table></div>`;
+}
+selB.onchange = ()=>{
+  selP.innerHTML = ""; selP.disabled = !selB.value;
+  if(!selB.value) selP.add(new Option("Önce birim seçin",""));
+  else { selP.add(new Option("Tüm bölümler","")); V.birimler.find(b=>b.ad===selB.value).programlar.forEach(p=>selP.add(new Option(p.ad,p.ad))); }
+  yilCiz();
+};
+selP.onchange = yilCiz;
+sekmeBagla(document.getElementById("yilTip"),d=>{yilTip=d;yilCiz();});
+window.birimSec = ad => { selB.value = ad; selB.onchange(); document.getElementById("yillik").scrollIntoView({behavior:"smooth"}); };
+yilCiz();
+
+// Grup çipleri + akordeon
+document.getElementById("gruplar").innerHTML = V.gruplar().length<2 ? "" : G.map(x=>`<a class="btn btn-cizgi" href="#grup-${F.kebap(x.g).replace(/\s+/g,'-')}">${x.g} (${F.n(x.T)})</a>`).join("");
+birimAkordeon(document.getElementById("birimler"), {yillik:true});
+const progSatir = () => { const r=[]; V.birimler.forEach(b=>b.programlar.forEach(p=>{ let K=0,E=0; Object.values(p.yillar).forEach(([k,e])=>{K+=k;E+=e;}); r.push([b.grup,b.ad,p.ad,p.tur,p.eqf,p.isced,K,E,K+E]); })); return r; };
+document.getElementById("csvProg").onclick = ()=> F.csvIndir("sau_mezun_program_toplamlari.csv",
+  ["birim_grubu","birim","program","duzey","ayc_eqf","isced_f_2013","kadin","erkek","toplam"], progSatir());
+document.getElementById("csvYil").onclick = ()=>{ const r=[]; V.birimler.forEach(b=>b.programlar.forEach(p=>Object.entries(p.yillar).forEach(([y,[k,e]])=>r.push([b.grup,b.ad,p.ad,p.tur,p.eqf,p.isced,y,k,e,k+e]))));
+  F.csvIndir("sau_mezun_yillik_seri.csv",["birim_grubu","birim","program","duzey","ayc_eqf","isced_f_2013","mezuniyet_yili","kadin","erkek","toplam"], r); };
+</script>
+</body>
+</html>

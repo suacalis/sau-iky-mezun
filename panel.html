@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mezun Paneli — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .kayit-izgara{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 16px}
+  @media(max-width:700px){.kayit-izgara{grid-template-columns:1fr 1fr}}
+  .kayit-izgara div span{display:block;font-size:12px;color:var(--soluk);text-transform:uppercase;letter-spacing:.03em}
+  .gecmis-satir{display:grid;grid-template-columns:110px 1fr 1fr 110px 110px 36px;gap:8px;align-items:end;margin-bottom:8px}
+  @media(max-width:860px){.gecmis-satir{grid-template-columns:1fr 1fr}}
+  .onay label{font-weight:500;display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--cizgi);margin:0}
+  .onay input{width:auto;margin-top:4px}
+  fieldset{border:0;padding:0;margin:0}
+  .kosullu.gizli{display:none}
+</style>
+</head>
+<body data-sayfa="panel">
+<section class="sayfa-bas"><div class="kap">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+    <div><p style="margin:0 0 4px">👋 Merhaba Mezun!</p><h1 id="adSoyad">Mezun Paneli</h1><p id="ozet"></p></div>
+    <button class="btn btn-beyaz" id="cikis" type="button">Çıkış yap</button>
+  </div>
+</div></section>
+
+<main><div class="kap">
+  <div class="uyari" style="margin-bottom:16px">Prototip: kaydettiğiniz bilgiler yalnızca bu tarayıcı oturumunda tutulur, sunucuya gönderilmez.</div>
+  <div class="panel-izgara">
+    <nav class="kart yan-menu" style="align-self:start;padding:10px;position:sticky;top:70px">
+      <a href="#kayit">Kayıt Bilgilerim</a>
+      <a href="#profil">İletişim ve İkamet</a>
+      <a href="#kisisel">Arka Plan Bilgileri</a>
+      <a href="#kariyer">Mevcut Durum</a>
+      <a href="#gecmis">Kariyer ve Eğitim Geçmişi</a>
+      <a href="#izinler">İzinler ve Onaylar</a>
+      <a href="#kose">Mezun Köşesine Gönder</a>
+      <a href="anketler.html">İzleme Anketi <span class="rozet amber" id="anketRozet" style="display:none">1</span></a>
+      <a href="#hesap">Hesap ve Verilerim</a>
+      <a href="#" id="diplomaLink" target="_blank" rel="noopener">Diploma Talep ↗</a>
+    </nav>
+
+    <div>
+      <!-- Kurum kaydından -->
+      <section class="kart" data-bolum="kayit" id="kayit">
+        <h3>Kayıt Bilgilerim</h3>
+        <p class="soluk" style="margin-top:0">Bu bilgiler öğrenci bilgi sisteminden alınır; size yeniden sorulmaz. Hata varsa Öğrenci İşleri'ne başvurun.</p>
+        <div class="kayit-izgara" id="kayitBilgi"></div>
+      </section>
+
+      <!-- İletişim -->
+      <section class="kart bolum" data-bolum="profil" id="profil">
+        <h3>İletişim ve İkamet</h3>
+        <p class="soluk" style="margin-top:0">Mezuniyetten yıllar sonra da size ulaşabilmemiz için kalıcı iletişim bilgisi önemlidir.</p>
+        <form data-form="profil" novalidate>
+          <div class="izgara i2">
+            <div class="alan"><label>Kişisel e-posta</label><input name="eposta" type="email" placeholder="ornek@eposta.com">
+              <div class="ipucu">Üniversite (@sakarya.edu.tr) adresiniz mezuniyetten sonra kapanabilir; lütfen kişisel bir adres yazın.</div></div>
+            <div class="alan"><label>Cep telefonu</label><input name="telefon" type="tel" placeholder="+90 5xx xxx xx xx"><div class="ipucu">Yurt dışındaysanız ülke koduyla yazın.</div></div>
+            <div class="alan"><label>İkamet ülkesi</label><select name="ikametUlke" data-ulke></select></div>
+            <div class="alan kosullu" data-kosul="ikametUlke=Türkiye"><label>İkamet ili</label><select name="il" data-il><option value="">Seçin</option></select></div>
+            <div class="alan kosullu gizli" data-kosul="ikametUlke!=Türkiye"><label>Şehir</label><input name="sehir"></div>
+            <div class="alan"><label>LinkedIn profili</label><input name="linkedin" placeholder="https://www.linkedin.com/in/…"></div>
+          </div>
+          <button class="btn btn-ana" type="submit">Kaydet</button> <span data-mesaj></span>
+        </form>
+      </section>
+
+      <!-- Arka plan -->
+      <section class="kart bolum" data-bolum="kisisel" id="kisisel">
+        <h3>Arka Plan Bilgileri</h3>
+        <p class="soluk" style="margin-top:0">Bu sorular yükseköğretimin sosyal hareketliliğe katkısını ve öğrenim hareketliliğinin kariyere etkisini anlamak için sorulur. Yanıtlar yalnızca toplu istatistiklerde kullanılır; istemediğiniz soruyu boş bırakabilirsiniz.</p>
+        <form data-form="kisisel" novalidate>
+          <div class="izgara i2">
+            <div class="alan"><label>Doğum ülkesi</label><select name="dogumUlke" data-ulke></select></div>
+            <div class="alan"><label>İkinci uyruk (varsa)</label><select name="ikinciUyruk" data-ulke data-bos="Yok"></select></div>
+            <div class="alan"><label>Annenizin tamamladığı en yüksek eğitim düzeyi</label><select name="anneEgitim" data-egitim></select></div>
+            <div class="alan"><label>Babanızın tamamladığı en yüksek eğitim düzeyi</label><select name="babaEgitim" data-egitim></select></div>
+          </div>
+          <h4 style="margin:10px 0 6px">Öğrenim sırasında yurt dışı deneyimi</h4>
+          <div class="izgara i3">
+            <div class="alan"><label>Tür</label><select name="hareketlilik">
+              <option value="">Yok</option><option>Erasmus+ öğrenim</option><option>Erasmus+ staj</option><option>Mevlana değişim</option>
+              <option>Diğer değişim / yaz okulu</option><option>Yurt dışında staj veya iş (program dışı)</option></select></div>
+            <div class="alan kosullu gizli" data-kosul="hareketlilik!="><label>Ülke</label><select name="hareketlilikUlke" data-ulke></select></div>
+            <div class="alan kosullu gizli" data-kosul="hareketlilik!="><label>Süre (ay)</label><input name="hareketlilikAy" inputmode="numeric" maxlength="2"></div>
+          </div>
+          <button class="btn btn-ana" type="submit">Kaydet</button> <span data-mesaj></span>
+        </form>
+      </section>
+
+      <!-- Mevcut durum -->
+      <section class="kart bolum" data-bolum="kariyer" id="kariyer">
+        <h3>Mevcut Durum</h3>
+        <form data-form="kariyer" novalidate>
+          <div class="alan"><label>Şu anki durumunuz</label><select name="durum">
+            <option value="">Seçin</option><option>Ücretli çalışıyorum</option><option>Kendi hesabıma çalışıyorum / girişimciyim</option>
+            <option>Hem çalışıyor hem eğitime devam ediyorum</option><option>Lisansüstü / başka bir eğitime devam ediyorum</option>
+            <option>İş arıyorum</option><option>Çalışmıyorum ve iş aramıyorum (askerlik, bakım, sağlık vb.)</option></select></div>
+          <fieldset class="kosullu gizli" data-kosul="durum=Ücretli çalışıyorum|Kendi hesabıma çalışıyorum / girişimciyim|Hem çalışıyor hem eğitime devam ediyorum">
+            <div class="izgara i2">
+              <div class="alan"><label>Meslek grubu (ISCO-08)</label><select name="meslek" data-isco></select></div>
+              <div class="alan"><label>Sektör</label><select name="sektor" data-sektor></select></div>
+              <div class="alan"><label>Kurum</label><input name="kurum"></div>
+              <div class="alan"><label>Unvan / pozisyon</label><input name="unvan"></div>
+              <div class="alan"><label>Çalışma süresi</label><select name="calismaSuresi"><option value="">Seçin</option><option>Tam zamanlı</option><option>Yarı zamanlı</option></select></div>
+              <div class="alan"><label>Sözleşme türü</label><select name="sozlesme"><option value="">Seçin</option><option>Süresiz (kadrolu / belirsiz süreli)</option><option>Belirli süreli</option><option>Serbest çalışma / proje bazlı</option><option>Stajyer / çırak</option><option>Kendi işim</option></select></div>
+              <div class="alan"><label>Çalışılan ülke</label><select name="isUlke" data-ulke></select></div>
+              <div class="alan"><label>Bu işe başlama (ay/yıl)</label><input name="baslama" type="month"></div>
+            </div>
+          </fieldset>
+          <fieldset class="kosullu gizli" data-kosul="durum~eğitim">
+            <div class="izgara i2">
+              <div class="alan"><label>Devam ettiğiniz program</label><input name="egitimProgram" placeholder="ör. Yüksek lisans — İşletme"></div>
+              <div class="alan"><label>Kurum ve ülke</label><input name="egitimKurum"></div>
+            </div>
+          </fieldset>
+          <button class="btn btn-ana" type="submit">Kaydet</button> <span data-mesaj></span>
+        </form>
+      </section>
+
+      <!-- Geçmiş -->
+      <section class="kart bolum" data-bolum="gecmis" id="gecmis">
+        <h3>Kariyer ve Eğitim Geçmişi</h3>
+        <p class="soluk" style="margin-top:0">Mezuniyetten bu yana çalıştığınız işleri ve tamamladığınız eğitimleri ekleyin (mevcut işiniz hariç).</p>
+        <div id="gecmisListe"></div>
+        <button class="btn btn-cizgi" type="button" id="gecmisEkle">+ Kayıt ekle</button>
+        <button class="btn btn-ana" type="button" id="gecmisKaydet">Kaydet</button> <span id="gecmisMesaj"></span>
+      </section>
+
+      <!-- İzinler -->
+      <section class="kart bolum" data-bolum="izinler" id="izinler">
+        <h3>İzinler ve Onaylar</h3>
+        <p class="soluk" style="margin-top:0">Her izni ayrı ayrı verebilir ya da geri alabilirsiniz. Ayrıntılar: <a href="kvkk.html">KVKK Aydınlatma Metni</a>.</p>
+        <form data-form="izinler" class="onay" novalidate>
+          <label><input type="checkbox" name="iletisim"><span><b>Duyuru ve etkinlik iletileri</b><br><span class="soluk">Üniversitenin mezunlara yönelik duyuru, etkinlik ve hizmet bilgilendirmelerini almak istiyorum.</span></span></label>
+          <label><input type="checkbox" name="anketDavet"><span><b>Mezun izleme anketlerine davet</b><br><span class="soluk">Mezuniyetten 1 ve 5 yıl sonra gönderilen izleme anketlerine davet edilmek istiyorum. Yanıtlarım yalnızca toplu ve anonim istatistiklerde kullanılır.</span></span></label>
+          <label><input type="checkbox" name="vitrin"><span><b>Mezun Vitrini</b><br><span class="soluk">Adım, programım, mezuniyet yılım ve kurumum Mezun Vitrini'nde görünebilir.</span></span></label>
+          <div style="margin-top:12px"><button class="btn btn-ana" type="submit">Kaydet</button> <span data-mesaj></span></div>
+        </form>
+      </section>
+
+      <!-- Köşe -->
+      <section class="kart bolum" data-bolum="kose" id="kose">
+        <h3>Mezun Köşesine İçerik Gönder</h3>
+        <p class="soluk" style="margin-top:0">Gönderiler değerlendirildikten sonra yayımlanır.</p>
+        <form data-form="kose" novalidate>
+          <div class="izgara i2">
+            <div class="alan"><label>Tür</label><select name="tur" required><option value="BasariHikayesi">Başarı Hikâyesi</option><option value="Yazi">Yazı</option><option value="Etkinlik">Etkinlik</option><option value="IsIlani">İş İlanı</option></select></div>
+            <div class="alan"><label>Başlık</label><input name="baslik" required maxlength="120"></div>
+          </div>
+          <div class="alan"><label>Kısa özet</label><input name="ozet" maxlength="240"></div>
+          <div class="alan"><label>Metin</label><textarea name="metin" rows="7" required></textarea><div class="ipucu">Kariyer yolculuğunuzu ve öğrencilerimize önerilerinizi paylaşabilirsiniz.</div></div>
+          <div class="alan"><label>Görsel (isteğe bağlı)</label><input name="gorsel" type="file" accept="image/*"></div>
+          <div class="alan onay"><label><input type="checkbox" name="onay" required><span>İçeriğin adım ve programımla birlikte yayımlanmasına açık rıza veriyorum.</span></label></div>
+          <button class="btn btn-ana" type="submit">Gönder</button> <span data-mesaj></span>
+        </form>
+      </section>
+
+      <!-- Hesap -->
+      <section class="kart bolum" data-bolum="hesap" id="hesap">
+        <h3>Hesap ve Verilerim</h3>
+        <p class="soluk" style="margin-top:0">KVKK kapsamındaki haklarınız gereği beyan ettiğiniz verilerin bir kopyasını alabilir ya da silinmesini isteyebilirsiniz.</p>
+        <button class="btn btn-cizgi" type="button" id="indir">⬇ Verilerimi indir (JSON)</button>
+        <button class="btn btn-cizgi" type="button" id="sil" style="color:#b3261e;border-color:#f0c2c6">Hesabımı ve verilerimi sil</button>
+        <span id="hesapMesaj"></span>
+      </section>
+    </div>
+  </div>
+</div></main>
+
+<script src="assets/veri.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+const O = OTURUM.al();
+if(!O){ location.replace("giris.html"); }
+else {
+  const V = MEZUN, $ = id => document.getElementById(id);
+  const prog = (()=>{ for(const b of V.birimler) for(const p of b.programlar) if(p.ad===O.program) return p; return null; })();
+  $("adSoyad").textContent = O.ad + " " + O.soyad;
+  $("ozet").textContent = `${O.program} · ${O.birim} · ${O.yil}`;
+  $("diplomaLink").href = SITE.diplomaTalep;
+  const k = (ad,v) => `<div><span>${ad}</span><b>${F.esc(v||"—")}</b></div>`;
+  $("kayitBilgi").innerHTML = k("Öğrenci no",O.no)+k("Program",O.program)+k("Birim",O.birim)+
+    k("Düzey (AYÇ/EQF)", prog?`${prog.tur} · ${prog.eqf}`:"—")+k("Alan (ISCED-F)", prog?`${prog.isced} ${V.ISCED[prog.isced]}`:"—")+
+    k("Mezuniyet yılı",O.yil)+k("Cinsiyet",O.cinsiyet)+k("Doğum (ay/yıl)",O.dogum)+k("Uyruk",O.uyruk);
+
+  // Seçenek listelerini doldur
+  document.querySelectorAll("select[data-ulke]").forEach(s=>{ s.add(new Option(s.dataset.bos||"Seçin","")); V.ULKE_LISTESI.forEach(u=>s.add(new Option(u,u))); });
+  document.querySelectorAll("select[data-il]").forEach(s=>Object.keys(V.ilKoordinat).sort((a,b)=>a.localeCompare(b,"tr")).forEach(i=>s.add(new Option(i,i))));
+  document.querySelectorAll("select[data-egitim]").forEach(s=>{ s.add(new Option("Seçin","")); V.EGITIM_DUZEYI.forEach(e=>s.add(new Option(e,e))); });
+  document.querySelectorAll("select[data-isco]").forEach(s=>{ s.add(new Option("Seçin","")); V.ISCO.forEach(([c,a])=>s.add(new Option(`${c} — ${a}`,c))); });
+  document.querySelectorAll("select[data-sektor]").forEach(s=>{ s.add(new Option("Seçin","")); V.sektorler.forEach(([a])=>s.add(new Option(a,a))); s.add(new Option("Diğer","Diğer")); });
+
+  // Koşullu alanlar: "alan=değer", "alan!=değer", "alan~içerir"
+  function kosullariUygula(f){
+    f.querySelectorAll("[data-kosul]").forEach(el=>{
+      const m = el.dataset.kosul.match(/^(\w+)(!=|=|~)(.*)$/); const v = (f.elements[m[1]]||{}).value||"";
+      const ok = m[2]==="=" ? m[3].split("|").includes(v) : m[2]==="!=" ? v!==m[3] : v.toLocaleLowerCase("tr-TR").includes(m[3]);
+      el.classList.toggle("gizli", !ok);
+    });
+  }
+  const anahtar = f => "sau_mezun_"+f+"_"+O.no;
+  const oku = f => { try{ return JSON.parse(sessionStorage.getItem(anahtar(f))||"null"); }catch(e){ return null; } };
+  const yaz = (f,v) => { try{ sessionStorage.setItem(anahtar(f), JSON.stringify(v)); }catch(e){} };
+  const mesaj = (el,t,tur="basari") => el.innerHTML = `<span class="${tur}" style="display:inline-block;padding:4px 10px">${t}</span>`;
+
+  document.querySelectorAll("form[data-form]").forEach(f=>{
+    const ad = f.dataset.form;
+    const kayitli = ad!=="kose" && oku(ad);
+    if(ad==="profil" && !kayitli) f.elements.ikametUlke.value = "Türkiye";
+    if(ad==="kariyer" && !kayitli) f.elements.isUlke.value = "Türkiye";
+    if(kayitli) Object.entries(kayitli).forEach(([n,v])=>{ const el=f.elements[n]; if(!el) return; el.type==="checkbox"?el.checked=v:el.value=v; });
+    kosullariUygula(f);
+    f.addEventListener("change", ()=>kosullariUygula(f));
+    f.onsubmit = e=>{
+      e.preventDefault();
+      const m = f.querySelector("[data-mesaj]");
+      if(!f.checkValidity()){ f.reportValidity(); return; }
+      const v = {}; [...f.elements].forEach(el=>{ if(!el.name||el.type==="file") return; v[el.name] = el.type==="checkbox"?el.checked:el.value; });
+      if(ad==="profil"){
+        if(v.eposta && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.eposta)) return mesaj(m,"E-posta geçersiz","hata");
+        if(/@(ogr\.)?sakarya\.edu\.tr$/i.test(v.eposta)) return mesaj(m,"Lütfen üniversite adresi yerine kişisel e-posta yazın","hata");
+      }
+      if(ad==="kose"){ mesaj(m,"Gönderildi — değerlendirme sonrası yayımlanacak."); f.reset(); return; }
+      yaz(ad, v); mesaj(m,"Kaydedildi");
+    };
+  });
+
+  // Geçmiş (tekrarlanabilir)
+  let gecmis = oku("gecmis") || [];
+  function gecmisCiz(){
+    $("gecmisListe").innerHTML = gecmis.length ? gecmis.map((g,i)=>`<div class="gecmis-satir" data-i="${i}">
+      <div><label>Tür</label><select data-k="tur"><option ${g.tur==="İş"?"selected":""}>İş</option><option ${g.tur==="Eğitim"?"selected":""}>Eğitim</option></select></div>
+      <div><label>Kurum</label><input data-k="kurum" value="${F.esc(g.kurum)}"></div>
+      <div><label>Pozisyon / program</label><input data-k="pozisyon" value="${F.esc(g.pozisyon)}"></div>
+      <div><label>Başlangıç</label><input data-k="bas" type="month" value="${F.esc(g.bas)}"></div>
+      <div><label>Bitiş</label><input data-k="bit" type="month" value="${F.esc(g.bit)}"></div>
+      <button class="btn btn-cizgi" type="button" data-sil title="Kaldır" aria-label="Kaldır">✕</button></div>`).join("")
+      : '<p class="soluk">Henüz kayıt yok.</p>';
+    $("gecmisListe").querySelectorAll(".gecmis-satir").forEach(s=>{
+      const i=+s.dataset.i;
+      s.querySelectorAll("[data-k]").forEach(el=>el.oninput=el.onchange=()=>{ gecmis[i][el.dataset.k]=el.value; });
+      s.querySelector("[data-sil]").onclick=()=>{ gecmis.splice(i,1); gecmisCiz(); };
+    });
+  }
+  $("gecmisEkle").onclick = ()=>{ gecmis.push({tur:"İş",kurum:"",pozisyon:"",bas:"",bit:""}); gecmisCiz(); };
+  $("gecmisKaydet").onclick = ()=>{
+    if(gecmis.some(g=>g.bas&&g.bit&&g.bit<g.bas)) return mesaj($("gecmisMesaj"),"Bitiş tarihi başlangıçtan önce olamaz","hata");
+    yaz("gecmis", gecmis.filter(g=>g.kurum||g.pozisyon)); mesaj($("gecmisMesaj"),"Kaydedildi");
+  };
+  gecmisCiz();
+
+  // Kohort anketi rozeti
+  const fark = V.dalgaYili - (+O.yil);
+  if(fark>=1 && fark<=5){ const anketVar = (()=>{ try{ return !!sessionStorage.getItem("sau_mezun_anket_"+V.dalgaYili+"_"+O.no); }catch(e){ return false; } })(); if(!anketVar) $("anketRozet").style.display="inline-block"; }
+
+  // Hesap
+  $("indir").onclick = ()=>{
+    const veri = {kayit:{no:O.no,program:O.program,birim:O.birim,mezuniyetYili:O.yil,cinsiyet:O.cinsiyet,dogum:O.dogum,uyruk:O.uyruk}};
+    try{ Object.keys(sessionStorage).filter(k=>k.endsWith("_"+O.no)).forEach(k=>veri[k.replace("sau_mezun_","").replace("_"+O.no,"")] = JSON.parse(sessionStorage.getItem(k))); }catch(e){}
+    const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([JSON.stringify(veri,null,2)],{type:"application/json"})); a.download="mezun_verilerim.json"; a.click();
+  };
+  $("sil").onclick = ()=>{
+    if(!confirm("Beyan ettiğiniz tüm bilgiler silinecek ve oturumunuz kapatılacak. Kurum kayıtlarındaki mezuniyet bilgileriniz yasal saklama süresince korunur. Devam edilsin mi?")) return;
+    try{ Object.keys(sessionStorage).filter(k=>k.endsWith("_"+O.no)).forEach(k=>sessionStorage.removeItem(k)); }catch(e){}
+    OTURUM.sil(); location.href="index.html";
+  };
+
+  const isaretle = ()=>{ const h=(location.hash||"#kayit").slice(1); document.querySelectorAll(".yan-menu a").forEach(a=>a.classList.toggle("aktif",a.getAttribute("href")==="#"+h)); };
+  addEventListener("hashchange",isaretle); isaretle();
+  $("cikis").onclick = ()=>{ OTURUM.sil(); location.href="index.html"; };
+}
+</script>
+</body>
+</html>

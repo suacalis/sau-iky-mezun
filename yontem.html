@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yöntem ve Tanımlar — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>.makale h2{margin-top:28px;font-size:21px} .makale p,.makale li{font-size:15.5px;line-height:1.7} dt{font-weight:700;margin-top:10px} dd{margin:2px 0 0 0;color:var(--soluk)}</style>
+</head>
+<body data-sayfa="yontem">
+<section class="sayfa-bas"><div class="kap">
+  <a class="geri" href="sonuclar.html">← Mezuniyet Sonrası Sonuçlar</a>
+  <h1>Yöntem ve Tanımlar</h1>
+  <p>Mezun izleme verilerinin nasıl toplandığı, hangi tanımların kullanıldığı ve nasıl yayımlandığı</p>
+</div></section>
+
+<main><div class="kap"><article class="makale kart">
+  <h2 style="margin-top:0">Amaç</h2>
+  <p>Mezun izleme çalışması; aday ve mevcut öğrencilere kariyer rehberliği sağlamak, programların müfredatını ve beceri kazanımını geliştirmek, bölgesel iş piyasası ihtiyaçlarını öngörmek ve kalite güvencesi süreçlerini beslemek amacıyla yürütülür. Çerçeve, Avrupa Birliği Konseyi'nin mezunların izlenmesine ilişkin 20 Kasım 2017 tarihli Tavsiye Kararı (2017/C 423/01) ile Avrupa Komisyonu uzman grubunun 2021 tarihli önerilerine dayanır. Sonuçlar <b>programları sıralamak için kullanılmaz</b>.</p>
+
+  <h2 id="takip">Bölümün izleme sistemi: iki bileşen</h2>
+  <p>İnsan Kaynakları Yönetimi Bölümü mezun izlemesi iki aracı birlikte kullanır:</p>
+  <ul>
+    <li><b><a href="takip.html">Mezun Takip Paneli</a>:</b> Polonya'nın ELA (Ekonomiczne Losy Absolwentów) sisteminin mantığını bölüme uyarlar. Mezuniyetten itibaren en fazla 60 ay boyunca iş bulma süresi, 12. ayda istihdam, işsizlik riski, göreli işsizlik (RIU) ve göreli ücret (RIW) gibi göstergeleri kohortlara göre hesaplar. Panel takma adlandırılmış, 22 sütunlu bir veri şablonuyla çalışır.</li>
+    <li><b>Lisans Mezunları İzleme Anketi (Sürüm 2):</b> Panelin ihtiyaç duyduğu bilgileri mezundan toplar ve bunlara Birleşik Krallık'taki HESA Graduate Outcomes anketinden uyarlanan modülleri ekler: referans haftası faaliyetleri, işin niteliği, diploma gerekliliği, işi bulma kanalı, girişimcilik, ileri eğitim, faaliyetin anlamlılığı, öznel iyi oluş ve program değerlendirmesi. Anket <a href="anketler.html">çevrim içi</a> doldurulabilir ya da <a href="belgeler/SAU_IKY_Mezun_Izleme_Anketi_v2.docx" download>Word formu</a> indirilebilir.</li>
+  </ul>
+  <p>Çevrim içi anket, Word formundaki <b>Ek A kodlama kılavuzunu</b> otomatik uygular: yanıtlar panelin 22 sütunlu şablonuna (ör. referans haftası faaliyetlerinden "durum", ilk iş tarihinden "ilk_is_suresi_ay", ücret aralığından orta nokta) ve ayrı bir ek değişkenler dosyasına dönüştürülür. Ücret net beyan edildiğinde kaba bir katsayıyla brütleştirilir; gerçek uygulamada bu katsayı güncel bordro parametreleriyle hesaplanmalıdır.</p>
+  <p>Uygulama düzeni: anket her yıl Ocak ayında mezuniyetten sonraki ilk 5 yıl içindeki tüm kohortlara gönderilir. Avrupa karşılaştırması için mezuniyetten 1 ve 5 yıl sonraki kohortlar <a href="sonuclar.html">Mezuniyet Sonrası Sonuçlar</a> sayfasında, HESA ile karşılaştırma için mezuniyetten yaklaşık 15 ay sonraki kesit ayrıca raporlanabilir. İyi oluş yanıtları yalnızca grup düzeyinde ve en az 10 kişilik gruplarda raporlanır.</p>
+
+  <h2>Veri kaynakları</h2>
+  <ul>
+    <li><b>Kurum kayıtları:</b> mezuniyet yılı, program, birim, düzey, cinsiyet, doğum ay/yılı ve uyruk gibi bilgiler öğrenci bilgi sisteminden alınır; mezundan yeniden istenmez.</li>
+    <li><b>Mezun profili:</b> mezunların Mezun Bilgi Sistemi'nde güncellediği iletişim, ikamet, çalışma ve eğitim bilgileri.</li>
+    <li><b>Mezun izleme anketi:</b> eğitim–iş uyumu, memnuniyet, iş arama süreci ve hareketlilik gibi yalnızca mezunun kendisinin verebileceği bilgiler.</li>
+    <li><b>İdari kayıtlarla eşleştirme (planlanan):</b> kurum dışı kayıtlarla, ilgili mevzuat ve protokoller çerçevesinde yalnızca anonimleştirilmiş toplu düzeyde eşleştirme hedeflenir.</li>
+  </ul>
+
+  <h2>Boylamsal tasarım: iki kohort</h2>
+  <p>Her izleme dalgasında iki mezun kohortuna ulaşılır: <b>mezuniyetten yaklaşık 1 yıl sonra</b> (iş piyasasına giriş) ve <b>yaklaşık 5 yıl sonra</b> (kariyer ilerlemesi). Böylece aynı mezun grubu zaman içinde izlenebilir ve kısa ile orta vadeli sonuçlar ayrı ayrı raporlanır. Yurt dışına taşınan mezunlara ulaşabilmek için mezunlardan mezuniyetten sonra da geçerli kalacak kişisel bir e-posta adresi istenir.</p>
+
+  <h2>Gösterge tanımları</h2>
+  <dl>
+    <dt>Çalışan oranı</dt><dd>Ankete yanıt veren mezunlardan, ücretli, kendi hesabına ya da girişimci olarak çalışanların payı.</dd>
+    <dt>Eğitime devam oranı</dt><dd>Çalışmayıp lisansüstü ya da başka bir örgün eğitime devam edenlerin payı.</dd>
+    <dt>Alanında çalışan (yatay uyum)</dt><dd>Çalışanlar arasında, işinin öğrenim gördüğü alanla ilgili olduğunu belirtenlerin payı (öz-değerlendirme).</dd>
+    <dt>Düzeyine uygun işte (dikey uyum)</dt><dd>Çalışanlar arasında, işinin kendi eğitim düzeyini (ör. lisans) gerektirdiğini belirtenlerin payı (öz-değerlendirme).</dd>
+    <dt>İlk işe geçiş süresi</dt><dd>Mezuniyetten ilk düzenli işe başlamaya kadar geçen ortalama süre (ay). Mezun olmadan önce işe başlayanlar 0 olarak sayılır.</dd>
+    <dt>Memnuniyet</dt><dd>1 (hiç memnun değilim) – 5 (çok memnunum) ölçeğinde ortalama puan.</dd>
+    <dt>Yurt dışında</dt><dd>Anket anında Türkiye dışında yaşayan ya da çalışan mezunların payı.</dd>
+    <dt>Yanıt oranı</dt><dd>Yanıt veren mezun sayısının kohorttaki toplam mezun sayısına oranı. Yanıt oranı düşük olduğunda sonuçlar, yanıt verenlerle vermeyenler arasındaki farklar nedeniyle yanlı olabilir.</dd>
+  </dl>
+
+  <h2>Sınıflamalar ve karşılaştırılabilirlik</h2>
+  <p>Avrupa düzeyindeki verilerle (ör. Eurograduate anketi) karşılaştırma yapabilmek için ortak sınıflamalar kullanılır:</p>
+  <ul>
+    <li><b>Düzey:</b> Türkiye Yükseköğretim Yeterlilikler Çerçevesi / Avrupa Yeterlilikler Çerçevesi (AYÇ/EQF) — ön lisans 5, lisans 6, yüksek lisans 7, doktora 8.</li>
+    <li><b>Öğrenim alanı:</b> ISCED-F 2013 (dar alan, 3 hane). <span class="soluk">Prototipte kodlar program adından yaklaşık olarak atanmıştır; canlı sistemde resmî program kodları kullanılmalıdır.</span></li>
+    <li><b>Meslek:</b> ISCO-08 ana gruplar. <b>Sektör:</b> NACE Rev.2 ile uyumlu gruplar.</li>
+  </ul>
+
+  <h2>Gizlilik ve yayımlama</h2>
+  <ul>
+    <li>Göstergeler yalnızca toplu düzeyde yayımlanır; kişi düzeyinde veri paylaşılmaz.</li>
+    <li>Bir program–kohort hücresinde yanıt sayısı <b id="esik"></b>'un altındaysa göstergeler gösterilmez ("yetersiz yanıt").</li>
+    <li>Toplu sonuçlar <a href="sonuclar.html">Mezuniyet Sonrası Sonuçlar</a> sayfasından CSV olarak açık biçimde indirilebilir.</li>
+    <li>Kişisel verilerin işlenmesine ilişkin bilgiler <a href="kvkk.html">KVKK Aydınlatma Metni</a>'nde yer alır.</li>
+  </ul>
+
+  <h2>İzleme sisteminin öz-değerlendirmesi</h2>
+  <p>Avrupa uzman grubu, mezun izleme sistemlerinin beş boyutta değerlendirilmesini önerir. Bu prototipin durumu:</p>
+  <div class="tablo-sar" style="max-height:none"><table>
+    <thead><tr><th>Boyut</th><th>Beklenti</th><th>Bu sistemdeki karşılığı</th></tr></thead>
+    <tbody>
+      <tr><td><b>Program kapsamı</b></td><td>Ön lisans, lisans, lisansüstü ve doktora programlarının tamamı</td><td>Tüm düzeyler (AYÇ 5–8) kapsamda</td></tr>
+      <tr><td><b>Mezun kapsamı</b></td><td>Yurt dışına taşınanlar dahil her kohorttaki tüm mezunlar</td><td>İkamet ülkesi ve kalıcı kişisel e-posta toplanıyor</td></tr>
+      <tr><td><b>Boylamsallık</b></td><td>Mezuniyetten sonra farklı zamanlarda ölçüm</td><td>1. ve 5. yıl kohortları</td></tr>
+      <tr><td><b>Veri kalitesi</b></td><td>Anket ve idari verinin birlikte, kaliteli kullanımı</td><td>Kurum kaydı + profil + anket; yanıt oranı her göstergede gösteriliyor. İdari kayıt eşleştirmesi planlanmalı.</td></tr>
+      <tr><td><b>Yayma ve kullanım</b></td><td>Anonim verinin açık biçimde, farklı kullanıcılar için yayımlanması</td><td>Program Sonuçları sayfası + CSV indirme; aday öğrenci rehberliği</td></tr>
+    </tbody></table></div>
+
+  <h2>Kaynaklar</h2>
+  <ul class="soluk">
+    <li>Bożykowski, M. ve Jasiński, M. — ELA (Ekonomiczne Losy Absolwentów) mezun izleme sistemi, OPI PIB. <span class="soluk">(Mezun Takip Paneli yöntem notunda ayrıntı verilmiştir.)</span></li>
+    <li>HESA — Graduate Outcomes survey questions (Birleşik Krallık).</li>
+    <li>Council of the European Union (2017). Council Recommendation of 20 November 2017 on tracking graduates (2017/C 423/01). <i>Official Journal of the European Union</i>, C 423, 1–4.</li>
+    <li>European Commission (2021). <i>Towards a European graduate tracking mechanism: Recommendations of the expert group (October 2018 – October 2020)</i>. Publications Office of the European Union. https://doi.org/10.2766/970793</li>
+  </ul>
+</article></div></main>
+
+<script src="assets/veri.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>document.getElementById("esik").textContent = MEZUN.KUCUK_HUCRE;</script>
+</body>
+</html>

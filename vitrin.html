@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mezun Vitrini — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-sayfa="vitrin">
+<section class="sayfa-bas"><div class="kap">
+  <h1>Mezun Vitrini</h1>
+  <p>Mezunlarımızın kendi kalemlerinden başarı hikâyeleri ve kariyer yolculukları.</p>
+</div></section>
+
+<main><div class="kap">
+  <div class="bolum-bas"><h2>Öne Çıkan Mezunlarımız</h2><a href="kose.html">Tüm içerikler →</a></div>
+  <div class="izgara i3" id="liste"></div>
+
+  <section class="bolum cta">
+    <div><h2>Siz de vitrinde yer alın</h2><p style="margin:0;opacity:.9">Giriş yapıp başarı hikâyenizi gönderin; değerlendirildikten sonra Mezun Vitrini'nde yayımlanır.</p></div>
+    <a class="btn btn-beyaz" href="panel.html#kose">Hikâyemi gönder</a>
+  </section>
+</div></main>
+
+<script src="assets/veri.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  const l = MEZUN.kose.filter(x=>x.vitrin);
+  document.getElementById("liste").innerHTML = l.length ? l.map(x=>KART.icerik(x)).join("")
+    : '<div class="kart soluk" style="grid-column:1/-1">Henüz vitrinde içerik yok.</div>';
+</script>
+</body>
+</html>

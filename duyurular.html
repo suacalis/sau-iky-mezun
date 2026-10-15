@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duyurular — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-sayfa="duyurular">
+<section class="sayfa-bas"><div class="kap">
+  <h1>Duyurular</h1>
+  <p>Mezunlarımıza yönelik duyurular, etkinlikler ve hizmet bilgilendirmeleri.</p>
+</div></section>
+
+<main><div class="kap" style="max-width:860px">
+  <div class="arac-satiri">
+    <input type="search" id="ara" placeholder="Duyurularda ara…" style="max-width:360px">
+    <span class="soluk" id="adet"></span>
+  </div>
+  <div class="izgara" id="liste"></div>
+</div></main>
+
+<script src="assets/veri.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  const ara = document.getElementById("ara");
+  function ciz(){
+    const q = ara.value.trim().toLocaleLowerCase("tr-TR");
+    const l = MEZUN.duyurular.filter(d => !q || (d.baslik+" "+d.govde.join(" ")).toLocaleLowerCase("tr-TR").includes(q))
+      .sort((a,b)=>b.tarih.localeCompare(a.tarih));
+    document.getElementById("adet").textContent = l.length + " duyuru";
+    document.getElementById("liste").innerHTML = l.length ? l.map(KART.duyuru).join("") : '<div class="kart soluk">Sonuç bulunamadı.</div>';
+  }
+  ara.oninput = ciz; ciz();
+</script>
+</body>
+</html>

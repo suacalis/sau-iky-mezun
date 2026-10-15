@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Genel İstatistikler — İKY Mezun Bilgi Sistemi | SAÜ İşletme Fakültesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-sayfa="istatistik">
+<section class="sayfa-bas"><div class="kap">
+  <a class="geri" href="index.html">← Anasayfaya dön</a>
+  <h1>Mezun Bilgi Sistemi</h1>
+  <p>Mezun istatistikleri, kariyer verileri ve il dağılımına tek noktadan erişin · <span id="yilEtiket"></span></p>
+</div></section>
+
+<main><div class="kap">
+  <div class="izgara i4" id="ozet"></div>
+
+  <!-- Mezuniyet türü -->
+  <section class="bolum kart">
+    <div class="arac-satiri"><h3>Öğretim Türü Dağılımı</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div class="sekmeler" id="turGrafik"><button data-d="doughnut" class="aktif">⭕ Halka</button><button data-d="pie">🥧 Pasta</button><button data-d="bar">📊 Bar</button></div>
+        <div class="sekmeler" id="turDonem"><button data-d="tum" class="aktif">Tüm Zamanlar</button><button data-d="yil">Bu Yıl</button></div>
+      </div></div>
+    <div class="izgara i2">
+      <div class="grafik-kutu"><canvas id="gTur"></canvas></div>
+      <div id="turOzet"></div>
+    </div>
+    <details style="margin-top:12px"><summary class="btn btn-cizgi" style="display:inline-flex">Detay gör</summary><div id="turTablo" style="margin-top:12px"></div></details>
+  </section>
+
+  <!-- Yıllara göre -->
+  <section class="bolum kart">
+    <div class="arac-satiri"><h3>Mezun İstatistikleri</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div class="sekmeler" id="yilGrafik"><button data-d="bar" class="aktif">📊 Bar</button><button data-d="line">📈 Çizgi</button><button data-d="yatay">📏 Yatay</button></div>
+        <div class="sekmeler" id="yilGorunum"><button data-d="yillar" class="aktif">Yıllara Göre</button><button data-d="cinsiyet">Cinsiyet</button><button data-d="buyil">Bu Yıl</button></div>
+      </div></div>
+    <div class="grafik-kutu" style="height:360px"><canvas id="gYil"></canvas></div>
+    <details style="margin-top:12px"><summary class="btn btn-cizgi" style="display:inline-flex">Detay gör</summary><div id="yilTablo" style="margin-top:12px"></div></details>
+  </section>
+
+  <!-- İl dağılımı -->
+  <section class="bolum kart">
+    <div class="arac-satiri"><h3>Mezun İl Dağılımı</h3>
+      <div class="sekmeler" id="ilDonem"><button data-d="tum" class="aktif">Tüm Zamanlar</button><button data-d="yil">Bu Yıl</button></div></div>
+    <div id="harita"></div>
+  </section>
+
+  <section class="bolum kart">
+    <div class="arac-satiri"><h3>En Fazla Mezun Verilen İller</h3>
+      <div class="sekmeler" id="ilGrafik"><button data-d="bar" class="aktif">📊 Bar</button><button data-d="yatay">📏 Yatay</button></div></div>
+    <div class="izgara i2">
+      <div class="grafik-kutu"><canvas id="gIl"></canvas></div>
+      <div><b>İl Özeti (İlk 8)</b> <span class="ke"><span class="k">● Kadın</span> <span class="e">● Erkek</span></span><div id="ilOzet" style="margin-top:8px"></div></div>
+    </div>
+    <details style="margin-top:12px"><summary class="btn btn-cizgi" style="display:inline-flex">Tüm illeri gör (81 il)</summary>
+      <div class="sekmeler" id="ilSira" style="margin:12px 0"><button data-d="T" class="aktif">Tümü</button><button data-d="K">Kadına Göre</button><button data-d="E">Erkeğe Göre</button></div>
+      <div id="ilTablo"></div></details>
+  </section>
+
+  <!-- Çalışma alanı -->
+  <section class="bolum kart">
+    <div class="arac-satiri"><h3>Çalışma Alanı Dağılımı</h3><span class="soluk" id="sektorAdet"></span></div>
+    <div id="sektor"></div>
+    <p class="soluk" style="font-size:13px;margin:12px 0 0" id="sektorNot"></p>
+  </section>
+
+  <!-- Uluslararası -->
+  <section class="bolum kart">
+    <div class="arac-satiri"><h3>Uluslararası Mezunlar <span class="soluk" id="ulkeSayi" style="font-weight:500;font-size:14px"></span></h3>
+      <div class="sekmeler" id="uluSekme"><button data-d="genel" class="aktif">Genel</button><button data-d="ulke">Ülke Bazlı</button><button data-d="birim">Birim/Bölüm</button><button data-d="yil">Bu Yıl</button></div></div>
+    <div id="ulu"></div>
+  </section>
+
+  <!-- Birim bazlı -->
+  <section class="bolum">
+    <div class="bolum-bas"><h2>Program Bazlı Mezun Dağılımı</h2><a href="birim-bazli.html">Ayrıntılı sayfa →</a></div>
+    <div id="birimler"></div>
+  </section>
+</div></main>
+
+<script src="assets/veri.js"></script>
+<script src="assets/data.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/harita.js"></script>
+<script src="assets/bilesen.js"></script>
+<script>
+const V = MEZUN, Y = V.guncelYil;
+document.getElementById("yilEtiket").textContent = Y + " Yılı Verileri";
+document.querySelectorAll("#turDonem [data-d=yil],#ilDonem [data-d=yil],#yilGorunum [data-d=buyil]").forEach(b=>b.textContent = Y+" Yılı");
+
+// Özet
+const T = V.toplam(), G = V.toplam({yil:Y});
+document.getElementById("ozet").innerHTML =
+  KART.stat("Toplam Mezun",F.n(T.T),"Tüm zamanlar","",RENK.lacivert) +
+  KART.stat("Kadın Mezun",F.n(T.K),"Kadın · "+F.yuzde(T.K,T.T),"kadin",RENK.kadin) +
+  KART.stat("Erkek Mezun",F.n(T.E),"Erkek · "+F.yuzde(T.E,T.T),"erkek",RENK.erkek) +
+  KART.stat(Y+" Yılı Mezun",F.n(G.T),"Güncel","",RENK.turkuaz);
+
+// Tür dağılımı
+const TURLER = V.birimler.flatMap(b=>b.programlar.map(p=>p.ad)); const kisa = t=>t.replace(/^.*\((.*)\)$/,"$1");
+let turTip="doughnut", turDonem="tum";
+function turCiz(){
+  const f = turDonem==="yil"?{yil:Y}:{};
+  const s = TURLER.map(t=>({t:kisa(t),...V.toplam({...f,program:t})}));
+  const top = s.reduce((a,x)=>a+x.T,0);
+  grafik("gTur",{type:turTip,data:{labels:TURLER.map(kisa),datasets:[{data:s.map(x=>x.T),backgroundColor:[RENK.turkuaz,RENK.mavi,RENK.amber,"#7a5cd6"],borderWidth:turTip==="bar"?0:2}]},
+    options:{plugins:{legend:{display:turTip!=="bar",position:"bottom"}},cutout:turTip==="doughnut"?"62%":undefined}});
+  document.getElementById("turOzet").innerHTML = `<div style="font-size:13px" class="soluk">${turDonem==="yil"?Y+" yılı mezunları":"Tüm zamanlar"}</div>
+    <div style="font-size:34px;font-weight:800">${F.n(top)}</div>` +
+    s.map((x,i)=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--cizgi)"><span><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${[RENK.turkuaz,RENK.mavi,RENK.amber,"#7a5cd6"][i]}"></span> ${x.t}</span><b>${F.n(x.T)} <span class="soluk" style="font-weight:500">${F.yuzde(x.T,top)}</span></b></div>`).join("");
+  document.getElementById("turTablo").innerHTML = `<div class="tablo-sar"><table><thead><tr><th>Öğretim türü</th><th class="sag">Kadın</th><th class="sag">Erkek</th><th class="sag">Toplam</th><th class="sag">Oran</th></tr></thead><tbody>
+    ${s.map(x=>`<tr><td>${x.t}</td><td class="sag">${F.n(x.K)}</td><td class="sag">${F.n(x.E)}</td><td class="sag"><b>${F.n(x.T)}</b></td><td class="sag">${F.yuzde(x.T,top)}</td></tr>`).join("")}</tbody></table></div>`;
+}
+sekmeBagla(document.getElementById("turGrafik"),d=>{turTip=d;turCiz();});
+sekmeBagla(document.getElementById("turDonem"),d=>{turDonem=d;turCiz();});
+turCiz();
+
+// Yıllara göre
+let yilTip="bar", yilGor="yillar";
+const seri = V.yilSerisi();
+function yilCiz(){
+  let ayar;
+  if(yilGor==="cinsiyet" || yilGor==="buyil"){
+    const d = yilGor==="buyil"?G:T;
+    ayar = {type:"doughnut",data:{labels:["Kadın","Erkek"],datasets:[{data:[d.K,d.E],backgroundColor:[RENK.kadin,RENK.erkek]}]},options:{cutout:"60%",plugins:{legend:{position:"bottom"},title:{display:true,text:(yilGor==="buyil"?Y+" yılı":"Tüm zamanlar")+" · "+F.n(d.T)+" mezun"}}}};
+  } else {
+    const yatay = yilTip==="yatay";
+    ayar = {type:yatay?"bar":yilTip,data:{labels:seri.map(s=>s.yil),datasets:[
+      {label:"Kadın",data:seri.map(s=>s.K),backgroundColor:RENK.kadin,borderColor:RENK.kadin,tension:.3},
+      {label:"Erkek",data:seri.map(s=>s.E),backgroundColor:RENK.erkek,borderColor:RENK.erkek,tension:.3}]},
+      options:{indexAxis:yatay?"y":"x",interaction:{mode:"index",intersect:false},scales:{x:{stacked:yilTip!=="line",grid:{display:false}},y:{stacked:yilTip!=="line"}},plugins:{legend:{position:"bottom"}}}};
+  }
+  document.getElementById("gYil").parentElement.style.height = (yilGor==="yillar"&&yilTip==="yatay")?"720px":"360px";
+  grafik("gYil",ayar);
+}
+document.getElementById("yilTablo").innerHTML = `<div class="tablo-sar"><table><thead><tr><th>Yıl</th><th class="sag">Kadın</th><th class="sag">Erkek</th><th class="sag">Toplam</th><th>Cinsiyet</th></tr></thead><tbody>
+  ${seri.slice().reverse().map(s=>`<tr><td>${s.yil}</td><td class="sag">${F.n(s.K)}</td><td class="sag">${F.n(s.E)}</td><td class="sag"><b>${F.n(s.T)}</b></td><td>${F.cubuk(s.K,s.E)}</td></tr>`).join("")}</tbody></table></div>`;
+sekmeBagla(document.getElementById("yilGrafik"),d=>{yilTip=d; if(yilGor!=="yillar"){yilGor="yillar";document.querySelectorAll("#yilGorunum button").forEach((b,i)=>b.classList.toggle("aktif",i===0));} yilCiz();});
+sekmeBagla(document.getElementById("yilGorunum"),d=>{yilGor=d;yilCiz();});
+yilCiz();
+
+// İller
+const ilVeri = donem => Object.fromEntries(Object.entries(V.iller).map(([il,a])=>[il, donem==="yil"?[a[2],a[3]]:[a[0],a[1]]]));
+let ilDonem="tum", ilTip="bar", ilSira="T";
+function ilCiz(){
+  const v = ilVeri(ilDonem);
+  const satir = HARITA(document.getElementById("harita"), v);
+  const ilk = satir.slice(0,10), top = satir.reduce((a,r)=>a+r.t,0);
+  grafik("gIl",{type:"bar",data:{labels:ilk.map(r=>r.il),datasets:[{label:"Kadın",data:ilk.map(r=>r.k),backgroundColor:RENK.kadin},{label:"Erkek",data:ilk.map(r=>r.e),backgroundColor:RENK.erkek}]},
+    options:{indexAxis:ilTip==="yatay"?"y":"x",scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true}},plugins:{legend:{position:"bottom"}}}});
+  document.getElementById("ilOzet").innerHTML = satir.slice(0,8).map(r=>`<div style="display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:7px 0;border-bottom:1px solid var(--cizgi)">
+    <b>${r.il}</b><b>${F.n(r.t)} <span class="soluk" style="font-weight:500">${F.yuzde(r.t,top)}</span></b>
+    <span class="ke"><span class="k">${F.n(r.k)}</span> · <span class="e">${F.n(r.e)}</span></span>${F.cubuk(r.k,r.e)}</div>`).join("");
+  ilTablosu(document.getElementById("ilTablo"), v, ilSira);
+}
+sekmeBagla(document.getElementById("ilDonem"),d=>{ilDonem=d;ilCiz();});
+sekmeBagla(document.getElementById("ilGrafik"),d=>{ilTip=d;ilCiz();});
+sekmeBagla(document.getElementById("ilSira"),d=>{ilSira=d;ilTablosu(document.getElementById("ilTablo"), ilVeri(ilDonem), ilSira);});
+ilCiz();
+
+// Sektör
+const sMax = Math.max(...V.sektorler.map(s=>s[1]));
+document.getElementById("sektorAdet").textContent = F.n(V.sektorBeyan) + " mezun beyanı";
+document.getElementById("sektor").innerHTML = `<div class="izgara i2">${V.sektorler.slice().sort((a,b)=>b[1]-a[1]).map(([ad,n])=>`
+  <div><div style="display:flex;justify-content:space-between;font-size:14px"><span>${ad}</span><b>${F.n(n)} <span class="soluk" style="font-weight:500">${F.yuzde(n,V.sektorBeyan)}</span></b></div>
+  <div class="cubuk" style="height:10px;margin-top:5px"><i style="width:${n/sMax*100}%;background:${RENK.mavi}"></i></div></div>`).join("")}</div>`;
+document.getElementById("sektorNot").textContent = `Yüzdeler, sektörünü beyan eden ${F.n(V.sektorBeyan)} mezun üzerinden hesaplanmıştır. Sisteme kayıtlı mezun sayısı ${F.n(V.kayitliMezun)}.`;
+
+// Uluslararası
+const U = V.ulkeler, UT = U.reduce((a,u)=>({K:a.K+u.K,E:a.E+u.E}),{K:0,E:0});
+document.getElementById("ulkeSayi").textContent = "· " + U.length + " ülke";
+function uluCiz(d){
+  const el = document.getElementById("ulu");
+  const ulkeKart = (u,deger) => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--cizgi)"><span>${u.ulke}</span><span><span class="ke"><span class="k">K${deger[0]}</span> <span class="e">E${deger[1]}</span></span> <b style="margin-left:8px">${deger[0]+deger[1]}</b></span></div>`;
+  if(d==="genel"){
+    const tur = {}; U.forEach(u=>Object.entries(u.tur).forEach(([t,[k,e]])=>{tur[t]=tur[t]||[0,0];tur[t][0]+=k;tur[t][1]+=e;}));
+    el.innerHTML = `<div class="izgara i3">${KART.stat("Toplam",F.n(UT.K+UT.E),"uluslararası mezun")}${KART.stat("Kadın",F.n(UT.K),F.yuzde(UT.K,UT.K+UT.E),"kadin")}${KART.stat("Erkek",F.n(UT.E),F.yuzde(UT.E,UT.K+UT.E),"erkek")}</div>
+      <div class="izgara i2" style="margin-top:16px"><div><b>Öğrenim Türüne Göre</b>${Object.entries(tur).map(([t,[k,e]])=>ulkeKart({ulke:t},[k,e])).join("")}</div>
+      <div><b>En Fazla Gelen Ülkeler</b>${U.slice(0,6).map(u=>ulkeKart(u,[u.K,u.E])).join("")}</div></div>`;
+  } else if(d==="ulke"){
+    el.innerHTML = `<div class="tablo-sar"><table><thead><tr><th>#</th><th>Ülke</th><th class="sag">K</th><th class="sag">E</th><th class="sag">Toplam</th><th>Öğrenim türü</th></tr></thead><tbody>
+      ${U.map((u,i)=>`<tr><td>${i+1}</td><td>${u.ulke}</td><td class="sag">${u.K}</td><td class="sag">${u.E}</td><td class="sag"><b>${u.K+u.E}</b></td><td class="soluk" style="font-size:12.5px">${Object.entries(u.tur).map(([t,[k,e]])=>({"Lisans":"L","Ön Lisans":"ÖL","Lisansüstü":"YL","Doktora":"Dr"})[t]+":"+(k+e)).join(" ")}</td></tr>`).join("")}</tbody></table></div>`;
+  } else if(d==="birim"){
+    const b = {}; U.forEach(u=>u.programlar.forEach(p=>{ b[p.birim]=b[p.birim]||{}; const q=b[p.birim][p.program]=b[p.birim][p.program]||{K:0,E:0,ulke:{}}; q.K+=p.K;q.E+=p.E; q.ulke[u.ulke]=(q.ulke[u.ulke]||0)+p.K+p.E; }));
+    const bl = Object.entries(b).map(([ad,pr])=>({ad,pr,T:Object.values(pr).reduce((a,x)=>a+x.K+x.E,0)})).sort((a,c)=>c.T-a.T);
+    el.innerHTML = bl.map(x=>`<details class="birim"><summary><span class="ad">${x.ad}</span><b>${x.T}</b></summary><div class="icerik"><div class="tablo-sar" style="max-height:none"><table>
+      <thead><tr><th>Program</th><th class="sag">K</th><th class="sag">E</th><th class="sag">Toplam</th><th>Ülkeler</th></tr></thead><tbody>
+      ${Object.entries(x.pr).sort((a,c)=>(c[1].K+c[1].E)-(a[1].K+a[1].E)).map(([p,q])=>`<tr><td>${p}</td><td class="sag">${q.K}</td><td class="sag">${q.E}</td><td class="sag"><b>${q.K+q.E}</b></td><td class="soluk" style="font-size:12.5px">${Object.entries(q.ulke).sort((a,c)=>c[1]-a[1]).map(([u,n])=>u+" "+n).join(", ")}</td></tr>`).join("")}
+      </tbody></table></div></div></details>`).join("");
+  } else {
+    const yl = U.map(u=>({...u,yk:u.buYil[0],ye:u.buYil[1]})).filter(u=>u.yk+u.ye>0).sort((a,c)=>(c.yk+c.ye)-(a.yk+a.ye));
+    const k=yl.reduce((a,u)=>a+u.yk,0), e=yl.reduce((a,u)=>a+u.ye,0);
+    el.innerHTML = `<div class="izgara i3">${KART.stat("Toplam",F.n(k+e),Y+" yılı uluslararası mezun")}${KART.stat("Kadın",F.n(k),"","kadin")}${KART.stat("Erkek",F.n(e),"","erkek")}</div>
+      <div style="margin-top:16px"><b>En Fazla Gelen Ülkeler</b>${yl.slice(0,10).map(u=>ulkeKart(u,[u.yk,u.ye])).join("")}</div>`;
+  }
+}
+sekmeBagla(document.getElementById("uluSekme"),uluCiz);
+uluCiz("genel");
+
+// Birimler
+birimAkordeon(document.getElementById("birimler"));
+</script>
+</body>
+</html>
