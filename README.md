@@ -11,7 +11,7 @@ SAÜ İşletme Fakültesi İnsan Kaynakları Yönetimi Bölümü için hazırlan
 
 ## Sayfalar
 
-| Dosya | Giresun karşılığı | İçerik |
+| Dosya | İçerik |
 |---|---|
 | `index.html` |  Kahraman alanı, rakamlarla mezunlar, vitrin, köşe, duyurular, hizmetler |
 | `kose.html` | | Tür sekmeleri (Yazı, Başarı Hikâyesi, Etkinlik, İş İlanı) + bölüm/yıl filtresi (`?tur=IsIlani`) |
