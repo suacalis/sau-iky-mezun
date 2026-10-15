@@ -9,30 +9,6 @@ SAÜ İşletme Fakültesi İnsan Kaynakları Yönetimi Bölümü için hazırlan
 > 2018–2024 kohort büyüklükleri Mezun Takip Paneli'nin demo verisiyle aynıdır, 2025–2026 tahminidir.
 > Menüde **Mezun İstatistikleri** Anasayfa'nın hemen yanındadır.
 
-## Sayfalar
-
-| Dosya | İçerik |
-|---|---|
-| `index.html` |  Kahraman alanı, rakamlarla mezunlar, vitrin, köşe, duyurular, hizmetler |
-| `kose.html` | | Tür sekmeleri (Yazı, Başarı Hikâyesi, Etkinlik, İş İlanı) + bölüm/yıl filtresi (`?tur=IsIlani`) |
-| `kose-detay.html?id=N` |  | İçerik detayı, yazar kartı, görüntülenme |
-| `vitrin.html` |  | Öne çıkan mezun hikâyeleri |
-| `duyurular.html` | ` | Duyuru listesi + arama |
-| `takip.html` | | Mezun Takip Paneli (ELA) — `takip/sau_iky_mezun_takip.html` portal içinde gömülü; tam ekran açılabilir |
-| `istatistikler.html` | | Öğretim türü dağılımı, yıllara göre, il haritası, ilk iller, sektör, uluslararası, birim akordeonu |
-| `il-dagilimi.html` |  | Türkiye kabarcık haritası (yakınlaştır/kaydır), ilk 10, 81 il tablosu |
-| `birim-bazli.html` | | Program Bazlı: I./II. öğretim karşılaştırması, program seçmeli yıllık seri, CSV |
-| `giris.html` || 3 adımlı giriş: numara + toplama sorusu → kimlik doğrulama (seçerek/yazarak, 3 hak) → program seçimi |
-| `yonetici-giris.html` |  | Personel girişi ekranı (SSO'ya bağlanacak) |
-| `panel.html` |  | İletişim, çalışma bilgileri, köşeye içerik gönderme |
-| `anketler.html` |  | Lisans Mezunları İzleme Anketi v2'nin çevrim içi sürümü (S1–S52, koşullu akış, referans haftası), Word formu indirme, 5 yıllık izleme takvimi; yanıtlar Ek A kurallarıyla panel şablonuna kodlanır |
-| `sonuclar.html` | | Program Sonuçları: istihdam, eğitime devam, yatay/dikey uyum, ilk işe geçiş, memnuniyet; küçük hücre gizleme, CSV |
-| `yontem.html` | | Yöntem ve tanımlar, sınıflamalar, gizlilik eşiği, 5 boyutlu öz-değerlendirme |
-| `kvkk.html` | | KVKK aydınlatma metni taslağı (hukuk birimince tamamlanmalı) |
-
-Prototipte giriş denemek için: öğrenci no `B201000001` veya biçimce geçerli bir T.C. no (`10000000146`).
-Formlar hiçbir sunucuya veri göndermez; kayıtlar yalnızca tarayıcı oturumunda (sessionStorage) tutulur.
-
 ## İzleme anketi → Mezun Takip Paneli veri akışı
 
 1. Mezun çevrim içi anketi doldurur (`anketler.html`). Ön bilgiler (mezuniyet yılı, öğretim türü, cinsiyet, ikamet) kayıt ve profilden gelir.
