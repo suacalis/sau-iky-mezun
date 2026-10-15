@@ -1,10 +1,8 @@
 # SAÜ İşletme Fakültesi · İnsan Kaynakları Yönetimi Bölümü — İKY Mezun Bilgi Sistemi (prototip)
 
-mezun.giresun.edu.tr'deki sayfa yapısı örnek alınarak SAÜ İşletme Fakültesi İnsan Kaynakları Yönetimi
-Bölümü için hazırlanmış, sunucu gerektirmeyen statik bir prototiptir. Bölümün **Mezun Takip Paneli**
+SAÜ İşletme Fakültesi İnsan Kaynakları Yönetimi Bölümü için hazırlanmış, sunucu gerektirmeyen statik bir prototiptir. Bölümün **Mezun Takip Paneli**
 (`takip/sau_iky_mezun_takip.html`, ELA modeli) ve **Lisans Mezunları İzleme Anketi v2**
-(`belgeler/SAU_IKY_Mezun_Izleme_Anketi_v2.docx`, ELA + HESA Graduate Outcomes) siteye entegre edilmiştir. Tasarım ve kod özgündür; Giresun Üniversitesi'ne ait
-görsel, metin veya veri kullanılmamıştır.
+(`belgeler/SAU_IKY_Mezun_Izleme_Anketi_v2.docx`, ELA + HESA Graduate Outcomes) siteye entegre edilmiştir.
 
 > **Önemli:** `assets/veri.js` boşken tüm sayılar **sentetik örnek veridir** (sayfalarda sarı
 > şerit görünür). Örnek veri İKY lisans programının I. ve II. öğretim kohortlarını (2018–2026) kapsar;
@@ -35,16 +33,11 @@ görsel, metin veya veri kullanılmamıştır.
 Prototipte giriş denemek için: öğrenci no `B201000001` veya biçimce geçerli bir T.C. no (`10000000146`).
 Formlar hiçbir sunucuya veri göndermez; kayıtlar yalnızca tarayıcı oturumunda (sessionStorage) tutulur.
 
-## Çalıştırma
-
-Dosyaları bir web sunucusundan açın (ör. `python3 -m http.server` ve `http://localhost:8000`)
-ya da klasörü GitHub Pages'e yükleyin. İnternet bağlantısı gerekir (Chart.js cdnjs'den, yazı tipi Google Fonts'tan yüklenir).
-
 ## İzleme anketi → Mezun Takip Paneli veri akışı
 
 1. Mezun çevrim içi anketi doldurur (`anketler.html`). Ön bilgiler (mezuniyet yılı, öğretim türü, cinsiyet, ikamet) kayıt ve profilden gelir.
 2. `assets/anket-kodlama.js`, Word formundaki **Ek A1** kurallarıyla yanıtı panelin 22 sütunlu şablonuna, **Ek A2** ile GO ek değişkenlerine (65 sütun) dönüştürür. Kimlik yerine takma ad kodu (`mezun_id`) kullanılır; e-posta hiçbir çıktıya yazılmaz.
-3. Bölüm, toplanan panel şablonu satırlarını birleştirip Mezun Takip Paneli'ndeki **Veri yükle** düğmesiyle yükler (test edildi: tek satırlık anket CSV'si panele sorunsuz yüklenir).
+3. Bölüm, toplanan panel şablonu satırlarını birleştirip Mezun Takip Paneli'ndeki **Veri yükle** düğmesiyle yükler.
 
 Not: net ücret kaba bir katsayıyla (`NET_BRUT_ORANI = 0.71`) brütleştirilir; gerçek kullanımda güncel bordro parametreleriyle değiştirin. TL dışı ücretler boş bırakılır (TCMB kuruyla araştırmacı çevirir).
 
@@ -60,22 +53,6 @@ Konsey Tavsiyesi (2017/C 423/01) ve Avrupa Komisyonu uzman grubu raporu (2021, d
 - **Karşılaştırılabilirlik:** AYÇ/EQF düzeyi (doktora ayrı tür), ISCED-F 2013 dar alan kodu (prototipte addan tahmin; resmî kodla değiştirilmeli).
 - **Veri koruma:** KVKK metni, ayrı ayrı izinler, verilerimi indir / hesabımı sil, yanıt sayısı < 10 olan hücrelerde gösterge yayımlanmaz (dönüştürücü bu göstergeleri veri.js'e hiç yazmaz).
 
-## Gerçek veriyle çalıştırma
-
-1. SABİS/Öğrenci İşleri'nden her satırı bir mezun olan bir CSV alın. Sütunlar:
-   `birim_grup, birim, program, tur, mezuniyet_yili, cinsiyet, il, uyruk, sektor`
-   (`il`, `uyruk`, `sektor` isteğe bağlı; ad/T.C./öğrenci no **gerekmez**.)
-   İsteğe bağlı `isced_f` (3 hane) ve `eqf` (5–8) sütunları sınıflamayı resmî kodlarla yapar.
-2. `python3 araclar/veri_donustur.py mezunlar.csv --kayitli 1834 > assets/veri.js`
-   Mezun izleme anketi yanıtlarını da eklemek için:
-   `python3 araclar/veri_donustur.py mezunlar.csv --anket anket.csv --dalga 2026 > assets/veri.js`
-   (anket sütunları betiğin başındaki açıklamada; gerçek veride anket yoksa Program Sonuçları boş görünür, örnek sonuç üretilmez.)
-3. Sayfayı yenileyin — örnek veri şeridi kalkar, tüm grafikler gerçek toplamlarla çizilir.
-
-Mezun Köşesi ve duyuru içerikleri `assets/data.js` içindeki `V.kose` / `V.duyurular` dizilerindedir;
-gerçek içerikleri ya oraya yazın ya da `assets/veri.js` içinde `window.MEZUN_KOSE = [...]` ve
-`window.MEZUN_DUYURU = [...]` tanımlayın (aynı alan adlarıyla).
-
 ## Özelleştirme
 
 `assets/app.js` başındaki `SITE` nesnesi: kurum adı, logo yolu (`logo: "assets/logo.png"`),
@@ -84,8 +61,7 @@ diploma talep bağlantısı, sosyal medya hesapları ve alt bilgi birimi.
 ## Canlıya alma için eksikler
 
 Gerçek kimlik doğrulama (SABİS SSO / e-Devlet), içerik onay ve yönetici paneli, anket yanıtlarının
-kaydı ve KVKK aydınlatma metni sunucu tarafında geliştirilmelidir. Sakarya Üniversitesi'nin
-halihazırda `mezun.sakarya.edu.tr` adresinde bir mezun sitesi olduğu da göz önünde bulundurulmalıdır.
+kaydı ve KVKK aydınlatma metni sunucu tarafında geliştirilmelidir.
 
 ## Dosya yapısı
 
